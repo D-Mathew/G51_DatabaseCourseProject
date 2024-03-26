@@ -1,0 +1,46 @@
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: rgb(35, 50, 82);
+    height: 100px;
+  }
+  
+#tennislogo {
+    width: 90px;
+    height: auto;
+    margin-left: 20px;
+}
+  
+.nav:nth-last-child(1), .nav:nth-last-child(2) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+  
+.navlink {
+    text-decoration: none;
+    color: white;
+    font-size: 30px;
+    margin-left: 20px;
+}
+
+.navlink:hover {
+    color: black;
+}
+  
+.login {
+    margin-left: auto;
+}
+  
+#loginicon {
+    margin-right: 20px;
+    width: 40px;
+    height: auto;
+}
+  
+#image-container {
+    width: 75%;
+    height: 50%;
+    background-color: green;
+}
