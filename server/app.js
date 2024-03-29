@@ -32,6 +32,57 @@ app.post("/todos", async(req, res) => {
   }
 })
 
+// User gets all hotels based on filter
+app.get("/hotels", async(req,res) => {
+  try {
+    const {price, capacity, view} = req.body;
+    const result = await pool.query('SELECT * FROM "Project".rooms WHERE price < $1 AND capacity = $2 AND view = $3 ORDER BY price DESC', [price, capacity, view]);
+    console.log(result.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+})
+
+// User gets to see VIEW of all hotels in area
+app.get("/hotelinarea", async(req,res) => {
+  try {
+    const result = await pool.query('SELECT * FROM "Project".view_available_rooms_per_area');
+    console.log(result.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+})
+
+
+// Customer makes booking
+app.post('/bookings', async (req, res) => {
+  try {
+   const  {roomid, customerid, booking, startdate, enddate} = req.body;
+   const result = await pool.query('INSERT INTO bookings/rentings (roomid, customerid, booking, startdate, enddate) VALUES ($1, $2, $3, $4, $5,)', [roomid, customerid, booking, startdate, enddate]);
+   console.log(result.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+})
+
+// Customer updates info 
+app.put('/customers/:customerId', async (req, res) => {
+  const { customerId } = req.params;
+  const { fullname, city, state, zipcode, streetnum, streetname, apartmentnum, idtype, idnumber } = req.body;
+
+  try {
+    const result = await pool.query(
+      'UPDATE customers SET fullname = $1, city = $2, state = $3, zipcode = $4, streetnum = $5, streetname = $6, apartmentnum = $7, idtype = $8, idnumber = $9 WHERE customerid = $10',
+      [fullname, city, state, zipcode, streetnum, streetname, apartmentnum, idtype, idnumber, customerId]
+    );
+    res.status(200).json({ message: 'Customer information updated successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+
 const port = process.env.PORT || 3001;
 
 function init() {
