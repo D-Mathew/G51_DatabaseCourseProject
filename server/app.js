@@ -2,11 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan')
 const db = require('./database')
+const cors = require('cors')
 
 const app = express();
 
 // Middleware
+app.use(cors())
 app.use(morgan("dev"))
+app.use(express.json())
 // app.use((req, res, next) => {
 //     console.log("This is a middleware");
 //     next();
