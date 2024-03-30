@@ -1,8 +1,8 @@
-CREATE SCHEMA IF NOT EXISTS "Project";
+CREATE SCHEMA IF NOT EXISTS project;
 
-CREATE TABLE IF NOT EXISTS "Project".bookings_rentings
+CREATE TABLE IF NOT EXISTS project.bookings_rentings
 (
-    bookingid integer NOT NULL,
+    bookingid BIGSERIAL PRIMARY KEY,
     roomid integer,
     employeeid integer,
     customerid integer,
@@ -11,37 +11,37 @@ CREATE TABLE IF NOT EXISTS "Project".bookings_rentings
     enddate date,
     CONSTRAINT bookings_rentings_pkey PRIMARY KEY (bookingid),
     CONSTRAINT bookings_rentings_customerid_fkey FOREIGN KEY (customerid)
-        REFERENCES "Project".customers (customerid) MATCH SIMPLE
+        REFERENCES project.customers (customerid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT bookings_rentings_employeeid_fkey FOREIGN KEY (employeeid)
-        REFERENCES "Project".employees (employeeid) MATCH SIMPLE
+        REFERENCES project.employees (employeeid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT bookings_rentings_roomid_fkey FOREIGN KEY (roomid)
-        REFERENCES "Project".rooms (roomid) MATCH SIMPLE
+        REFERENCES project.rooms (roomid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
 
 
-CREATE TABLE IF NOT EXISTS "Project".chainscontact
+CREATE TABLE IF NOT EXISTS project.chainscontact
 (
     chainid integer,
     phonenumber integer,
     CONSTRAINT chainscontact_chainid_fkey FOREIGN KEY (chainid)
-        REFERENCES "Project".hotelchains (chainid) MATCH SIMPLE
+        REFERENCES project.hotelchains (chainid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT chainscontact_phonenumber_fkey FOREIGN KEY (phonenumber)
-        REFERENCES "Project".hotelchains (phonenumbers) MATCH SIMPLE
+        REFERENCES project.hotelchains (phonenumbers) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
 
-CREATE TABLE IF NOT EXISTS "Project".customers
+CREATE TABLE IF NOT EXISTS project.customers
 (
-    customerid integer NOT NULL,
+    customerid BIGSERIAL PRIMARY KEY,
     fullname character varying(255) COLLATE pg_catalog."default",
     city character varying(255) COLLATE pg_catalog."default",
     state character varying(255) COLLATE pg_catalog."default",
@@ -53,12 +53,13 @@ CREATE TABLE IF NOT EXISTS "Project".customers
     idnumber integer,
     registrationdate date,
     hashed_password character varying COLLATE pg_catalog."default" NOT NULL,
+    email character varying COLLATE pg_catalog."default",
     CONSTRAINT customers_pkey PRIMARY KEY (customerid)
 )
 
-CREATE TABLE IF NOT EXISTS "Project".employees
+CREATE TABLE IF NOT EXISTS project.employees
 (
-    employeeid integer NOT NULL,
+    employeeid BIGSERIAL PRIMARY KEY,
     hotelid integer,
     fullname character varying(255) COLLATE pg_catalog."default",
     address character varying(255) COLLATE pg_catalog."default",
@@ -67,14 +68,14 @@ CREATE TABLE IF NOT EXISTS "Project".employees
     hashed_password character varying COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT employees_pkey PRIMARY KEY (employeeid),
     CONSTRAINT employees_hotelid_fkey FOREIGN KEY (hotelid)
-        REFERENCES "Project".hotels (hotelid) MATCH SIMPLE
+        REFERENCES project.hotels (hotelid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
 
-CREATE TABLE IF NOT EXISTS "Project".hotelchains
+CREATE TABLE IF NOT EXISTS project.hotelchains
 (
-    chainid integer NOT NULL,
+    chainid BIGSERIAL PRIMARY KEY,
     city character varying(255) COLLATE pg_catalog."default",
     state character varying(255) COLLATE pg_catalog."default",
     zipcode character varying(255) COLLATE pg_catalog."default",
@@ -89,39 +90,23 @@ CREATE TABLE IF NOT EXISTS "Project".hotelchains
 )
 
 
-CREATE TABLE IF NOT EXISTS "Project".hotelchains
-(
-    chainid integer NOT NULL,
-    city character varying(255) COLLATE pg_catalog."default",
-    state character varying(255) COLLATE pg_catalog."default",
-    zipcode character varying(255) COLLATE pg_catalog."default",
-    streetnum character varying(255) COLLATE pg_catalog."default",
-    streetname character varying(255) COLLATE pg_catalog."default",
-    apartmentnum character varying(255) COLLATE pg_catalog."default",
-    noofhotels integer,
-    email character varying(255) COLLATE pg_catalog."default",
-    phonenumbers bigint,
-    CONSTRAINT hotelchains_pkey PRIMARY KEY (chainid),
-    CONSTRAINT unique_phonenumbers UNIQUE (phonenumbers)
-)
-
-CREATE TABLE IF NOT EXISTS "Project".hotelcontacts
+CREATE TABLE IF NOT EXISTS project.hotelcontacts
 (
     hotelid integer,
     phonenumber integer,
     CONSTRAINT hotelcontacts_hotelid_fkey FOREIGN KEY (hotelid)
-        REFERENCES "Project".hotels (hotelid) MATCH SIMPLE
+        REFERENCES project.hotels (hotelid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT hotelcontacts_phonenumber_fkey FOREIGN KEY (phonenumber)
-        REFERENCES "Project".hotels (phonenumber) MATCH SIMPLE
+        REFERENCES project.hotels (phonenumber) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
 
-CREATE TABLE IF NOT EXISTS "Project".hotels
+CREATE TABLE IF NOT EXISTS project.hotels
 (
-    hotelid integer NOT NULL,
+    hotelid BIGSERIAL PRIMARY KEY,
     chainid integer,
     noofrooms integer,
     ratings integer,
@@ -137,14 +122,14 @@ CREATE TABLE IF NOT EXISTS "Project".hotels
     CONSTRAINT hotels_pkey PRIMARY KEY (hotelid),
     CONSTRAINT unique_phonenumber UNIQUE (phonenumber),
     CONSTRAINT hotels_chainid_fkey FOREIGN KEY (chainid)
-        REFERENCES "Project".hotelchains (chainid) MATCH SIMPLE
+        REFERENCES project.hotelchains (chainid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
 
-CREATE TABLE IF NOT EXISTS "Project".rooms
+CREATE TABLE IF NOT EXISTS project.rooms
 (
-    roomid integer NOT NULL,
+    roomid BIGSERIAL PRIMARY KEY,
     hotelid integer,
     price integer,
     amenities character varying(255) COLLATE pg_catalog."default",
@@ -154,14 +139,14 @@ CREATE TABLE IF NOT EXISTS "Project".rooms
     problems character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT rooms_pkey PRIMARY KEY (roomid),
     CONSTRAINT rooms_hotelid_fkey FOREIGN KEY (hotelid)
-        REFERENCES "Project".hotels (hotelid) MATCH SIMPLE
+        REFERENCES project.hotels (hotelid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
 
-CREATE TABLE IF NOT EXISTS "Project".archived_bookings_rentings
+CREATE TABLE IF NOT EXISTS project.archived_bookings_rentings
 (
-    bookingid integer NOT NULL,
+    bookingid BIGSERIAL PRIMARY KEY,
     roomid integer,
     employeeid integer,
     customerid integer,
@@ -171,9 +156,10 @@ CREATE TABLE IF NOT EXISTS "Project".archived_bookings_rentings
     CONSTRAINT archived_bookings_rentings_pkey PRIMARY KEY (bookingid)
 )
 
+
 -- Marriott Hotels (1-8)
 -- Continuing with U.S. locations
-INSERT INTO "Project".Hotels (HotelID, ChainID, NoOfRooms, Ratings, City, State, ZipCode, StreetNum, StreetName, Email, PhoneNumber, name)
+INSERT INTO project.Hotels (HotelID, ChainID, NoOfRooms, Ratings, City, State, ZipCode, StreetNum, StreetName, Email, PhoneNumber, name)
 VALUES
 (1, 1, 300, 5, 'New York', 'NY', '10001', '1', 'Times Square', 'timesqmarriott@marriott.com', 1234567890, 'Pacific Estate Resort'),
 (2, 1, 250, 4, 'New York', 'NY', '10010', '2', 'Lexington Avenue', 'lexmarriott@marriott.com', 1234567891, 'Emerald Tide Resort'),
@@ -221,7 +207,7 @@ VALUES
 (40, 5, 290, 5, 'Calgary', 'AB', 'T2P 3H5', '40', '9 Avenue SW', '9avewyndham@wyndham.com', 5556664448, 'Ninth Nirvana Hotel');
 
 
-INSERT INTO "Project".rooms (roomid, hotelid, price, amenities, capacity, view, canextend, problems)
+INSERT INTO project.rooms (roomid, hotelid, price, amenities, capacity, view, canextend, problems)
 VALUES
 -- Hotel 1 Rooms
 (1, 1, 100, 'Wi-Fi, TV, Minibar', 'Single', 'City View', FALSE, ''),
@@ -494,7 +480,7 @@ VALUES
 (200, 40, 515, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Sea View', TRUE, '');
 
 
-SET search_path = "Project";
+SET search_path = project;
 
 -- SELECT * FROM hotels WHERE city = 'New York';
 SELECT * FROM hotels WHERE city = 'New York';

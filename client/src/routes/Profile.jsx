@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import { useAuth } from '../AuthContext'; 
 
-export const LoginRegister = () => {
+export const Profile = () => {
   const [error, setError] = useState(''); // State to store error message
   const [loginType, setLoginType] = useState('customer');
   const [loginInfo, setLoginInfo] = useState({ email: '', password: '' });
@@ -71,36 +71,9 @@ export const LoginRegister = () => {
     <div className="container mt-5">
       <div className="row">
           <div className="col">
-              <div className="card mb-3">
-                  <div className="card-body">
-                      <h2 className="card-title text-center">Login</h2>
-                      <div className="btn-group" role="group" aria-label="User type">
-                          <input type="radio" className="btn-check" name="loginType" id="customer" autoComplete="off" checked={loginType === 'customer'} onChange={() => setLoginType('customer')} />
-                          <label className="btn btn-outline-secondary" htmlFor="customer">Customer</label>
-
-                          <input type="radio" className="btn-check" name="loginType" id="employee" autoComplete="off" checked={loginType === 'employee'} onChange={() => setLoginType('employee')} />
-                          <label className="btn btn-outline-secondary" htmlFor="employee">Employee</label>
-                      </div>
-                      <form onSubmit={handleLoginSubmit}>
-                          <div className="mb-3">
-                              <label htmlFor="username" className="form-label">Email</label>
-                              <input type="text" className="form-control" id="username" name="email" value={loginInfo.email} onChange={handleLoginChange} required />
-                          </div>
-                          <div className="mb-3">
-                              <label htmlFor="password" className="form-label">Password</label>
-                              <input type="password" className="form-control" id="password" name="password" value={loginInfo.password} onChange={handleLoginChange} required />
-                          </div>
-                          <button type="submit" className="btn btn-primary w-100">Log In</button>
-                      </form>
-                  </div>
-              </div>
-          </div>
-      </div>
-      <div className="row">
-          <div className="col">
               <div className="card">
                   <div className="card-body">
-                      <h2 className="card-title text-center">Register</h2>
+                      <h2 className="card-title text-center">Edit Profile</h2>
                       <form onSubmit={handleRegisterSubmit}>
                           <div className="mb-3">
                               <label htmlFor="email" className="form-label">Email address</label>
@@ -163,4 +136,4 @@ export const LoginRegister = () => {
   )
 }
 
-export default LoginRegister
+export default Profile

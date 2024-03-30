@@ -7,11 +7,15 @@ import Home from './routes/Home.jsx'
 import LoginRegister from './routes/LoginRegister.jsx'
 import PaymentInfo from './routes/PaymentInfo.jsx'
 import ShowBookings from './routes/ShowBookings.jsx'
+import Profile from './routes/Profile.jsx'
 import "./static/styles/main.css"
 import Hotels from './routes/Hotels.jsx'
+import { AuthProvider } from './AuthContext.js';
+
 
 const App = () => {
     return <div>
+        <AuthProvider>
         <Router> {/* Router Tag from import */}
             <Navbar />
             <Routes>
@@ -22,8 +26,10 @@ const App = () => {
                 <Route exact path='/bookings' Component={Bookings}></Route>
                 <Route exact path='/paymentInfo' Component={PaymentInfo}></Route>
                 <Route exact path='/showBookings' Component={ShowBookings}></Route>
+                <Route exact path='/profile' Component={Profile}></Route>
             </Routes>
         </Router>
+        </AuthProvider>
     </div>
 }
 
