@@ -15,7 +15,7 @@ app.use(express.json())
 //     next();
 // });
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 
 function init() {
     // app.use(express.static('static')) // Set Static Files
@@ -25,7 +25,7 @@ function init() {
     })
   
     require("./controller.js")(app, db)
-}
+}   
 
 init()
 

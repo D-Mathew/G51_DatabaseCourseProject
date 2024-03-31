@@ -1,11 +1,13 @@
 import React, {useState} from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
+import { useAuth } from '../AuthContext'; 
 
 export const LoginRegister = () => {
   const [error, setError] = useState(''); // State to store error message
   const [loginType, setLoginType] = useState('customer');
-  const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
+  const [loginInfo, setLoginInfo] = useState({ email: '', password: '' });
+  const { login } = useAuth();
   const [registerInfo, setRegisterInfo] = useState({ 
     email: '', 
     password: '', 
@@ -32,31 +34,51 @@ export const LoginRegister = () => {
       const { name, value } = e.target;
       setRegisterInfo({ ...registerInfo, [name]: value });
   };
+  
+    // const handleLoginSubmit = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         const response = await axios.post('http://localhost:4000/api/login', loginInfo);
+    //         if (response.status === 200) {
+    //             login(response.data.email, response.data.role); // Use the role from the response
+    //             navigate('/');
+    //         } else {
+    //             console.error('Login failed with status:', response.status);
+    //         }
+    //     } catch (err) {
+    //         console.error('Login error:', err);
+    //         setError(err.response?.data?.message || 'Failed to log in');
+    //     }
+    // };
 
-  const handleLoginSubmit = async (e) => {
-      e.preventDefault();
-      console.log('Logging in as:', loginType);
-      console.log(loginInfo);
-      try {
-        const response = await axios.post('http://localhost:4000/api/login', loginInfo);
-        if (response) {
-          navigate('/')
+    const handleLoginSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const endpoint = `/api/login/${loginType}`; // Use loginType in the endpoint
+            const response = await axios.post(`http://localhost:4000${endpoint}`, loginInfo);
+            if (response.status === 200) {
+                login(loginInfo.email, loginType); // Optionally, handle roles if needed
+                navigate('/');
+            } else {
+                console.error('Login failed with status:', response.status);
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            setError(err.response?.data?.message || 'Failed to log in');
         }
-      } catch (err) {
-          setError(err.response?.data?.message || 'Fail to register user');
-      }
-      // Implement login logic here
-  };
+    };
+    
+
 
   const handleRegisterSubmit = async (e) => {
       e.preventDefault();
       console.log('Registering new customer');
-      console.log(registerInfo);
       try {
         const response = await axios.post('http://localhost:4000/api/register', registerInfo);
-        if (response) {
-          navigate('/')
-        }
+        console.log(response);
+        // if (response) {
+        //   navigate('/')
+        // }
       } catch (err) {
           setError(err.response?.data?.message || 'Fail to register user');
       }
@@ -77,8 +99,8 @@ export const LoginRegister = () => {
                       </div>
                       <form onSubmit={handleLoginSubmit}>
                           <div className="mb-3">
-                              <label htmlFor="username" className="form-label">Username</label>
-                              <input type="text" className="form-control" id="username" name="username" value={loginInfo.username} onChange={handleLoginChange} required />
+                              <label htmlFor="username" className="form-label">Email</label>
+                              <input type="text" className="form-control" id="username" name="email" value={loginInfo.email} onChange={handleLoginChange} required />
                           </div>
                           <div className="mb-3">
                               <label htmlFor="password" className="form-label">Password</label>
