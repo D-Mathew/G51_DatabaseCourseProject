@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import { useDates } from '../DateContext'
 import apis from '../apis'
+import axios from 'axios';
 
 export const Home = () => {
   const today = new Date().toISOString().split('T')[0]
@@ -13,6 +14,9 @@ export const Home = () => {
 
   const {setDates}= useDates();
   const navigate = useNavigate();
+
+  const [availability, setAvailability] = useState([]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,6 +40,18 @@ export const Home = () => {
   useEffect(() => {
     setDates({ startDate: formData.startDate, endDate: formData.endDate });
   }, [formData])
+
+  useEffect(() => {
+    const fetchAvailability = async () => {
+        try {
+            const response = await axios.get('http://localhost:4000/api/availability'); // Adjust the URL as needed
+            setAvailability(response.data.data);
+        } catch (error) {
+            console.error("There was an error fetching the availability:", error);
+        }
+    };
+    fetchAvailability();
+    }, []);
 
   const handleSearch = async (e) => {
       e.preventDefault();
@@ -93,6 +109,25 @@ export const Home = () => {
           </div>
           <button type="submit" className="btn btn-primary">Search</button>
       </form>
+      <table className="table mt-4">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">city</th>
+                        <th scope="col">Today's Available Rooms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {availability.map((item, index) => (
+                        <tr key={index}>
+                            <th scope="row">{index + 1}</th>
+                            <td>{item.city}</td> {/* Adjust 'item.date' based on your data structure */}
+                            <td>{item.available_rooms}</td> {/* Adjust 'item.available_rooms' based on your data structure */}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
     </div>
   )
 }

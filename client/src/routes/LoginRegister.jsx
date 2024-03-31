@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import { useAuth } from '../AuthContext'; 
@@ -7,7 +7,7 @@ export const LoginRegister = () => {
   const [error, setError] = useState(''); // State to store error message
   const [loginType, setLoginType] = useState('customer');
   const [loginInfo, setLoginInfo] = useState({ email: '', password: '' });
-  const { login } = useAuth();
+//   const { login } = useAuth();
   const [registerInfo, setRegisterInfo] = useState({ 
     email: '', 
     password: '', 
@@ -22,6 +22,16 @@ export const LoginRegister = () => {
     idType: '',
     idNum: '',
   });
+
+  const { login, isLoggedIn, userEmail, userRole, customerID } = useAuth();
+
+  // Logging the context values to see if they are updated
+  useEffect(() => {
+    console.log('Is Logged In:', isLoggedIn);
+    console.log('User Email:', userEmail);
+    console.log('User Role:', userRole);
+    console.log('Customer ID:', customerID);
+  }, [isLoggedIn, userEmail, userRole, customerID]); // Dependency array to re-run this effect whenever these values change
 
   const navigate = useNavigate();
 
@@ -57,7 +67,13 @@ export const LoginRegister = () => {
             const endpoint = `/api/login/${loginType}`; // Use loginType in the endpoint
             const response = await axios.post(`http://localhost:4000${endpoint}`, loginInfo);
             if (response.status === 200) {
-                login(loginInfo.email, loginType); // Optionally, handle roles if needed
+                console.log(response.data.data.id);
+                login(loginInfo.email, loginType, response.data.data.id); // Optionally, handle roles if needed
+                console.log('After Login - Context Values:');
+        console.log('Is Logged In:', isLoggedIn);
+        console.log('User Email:', userEmail);
+        console.log('User Role:', userRole);
+        console.log('Customer ID:', customerID);
                 navigate('/');
             } else {
                 console.error('Login failed with status:', response.status);

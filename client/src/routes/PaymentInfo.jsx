@@ -1,22 +1,22 @@
 import React, {useState} from 'react'
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios'
 import { useDates } from '../DateContext';
-import { useNavigate } from 'react-router-dom';
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import apis from '../apis';
 // import { useAuth } from '../AuthContext'; 
+import { useAuth } from '../AuthContext'; 
 
 export const PaymentInfo = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    // const { login } = useAuth();
-    const {search} = location.state|| {}; // Empty obj if no state  
-    console.log(search)
+    const {search, hotelId, roomId} = location.state|| {}; // Empty obj if no state  
+    // console.log(search)
     let { id } = useParams();
-
+    const { customerID } = useAuth();
     const {dates} = useDates();
-    const nightlyRate = search.data.price; // Example rate, adjust as needed
+    const nightlyRate = search.price; // Example rate, adjust as needed
     const calculateNights = (startDate, endDate) => {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -46,19 +46,33 @@ export const PaymentInfo = () => {
     };
 
     const handlePaymentSubmit = async (e) => {
-        // e.preventDefault();
-        // try {
-        //     const response = await apis.post(`http://localhost:4000/api/book`, paymentInfo);
-        //     if (response.status === 200) {
-        //         // login(loginInfo.email, loginType); // Optionally, handle roles if needed
-        //         alert("Book Room Successfully")
-        //         navigate('/bookings');
-        //     } else {
-        //         console.error('Login failed with status:', response.status);
-        //     }
-        // } catch (err) {
-        //     console.error('Login error:', err);
-        // }
+        e.preventDefault();
+        const bookingDetails = {
+            roomid: roomId,
+            hotelid: hotelId,
+            customerid: customerID,
+            startdate: dates.startDate,
+            enddate: dates.endDate,
+            card_no: paymentInfo.cardNumber,
+            card_expiry: paymentInfo.expiryDate,
+            card_cvv: paymentInfo.cvv
+            // Add more details as per your requirements
+        };
+
+        try {
+            console.log(bookingDetails);
+            const response = await axios.post('http://localhost:4000/api/bookRoom', bookingDetails);
+            if (response.status === 200) {
+                // Handle success, for example redirect to a success page or display a success message
+                navigate('/bookingSuccess', { state: { bookingDetails: response.data } }); // Adjust the path as necessary
+            } else {
+                // Handle other HTTP statuses or failure scenarios
+                console.error('Booking failed with status:', response.status);
+            }
+        } catch (err) {
+            console.error('Error during booking:', err);
+            // Handle error, such as displaying an error message to the user
+        }
     };
     
     return (
