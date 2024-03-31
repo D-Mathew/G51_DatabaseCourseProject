@@ -22,6 +22,13 @@ CREATE TABLE IF NOT EXISTS project.bookings_rentings
         ON DELETE NO ACTION
 )
 
+Set search_path = "project";
+ALTER TABLE bookings_rentings
+ADD COLUMN hotelid INTEGER,
+ADD CONSTRAINT fk_hotel
+FOREIGN KEY (hotelid)
+REFERENCES hotels(hotelid);
+
 
 CREATE TABLE IF NOT EXISTS project.chainscontact
 (

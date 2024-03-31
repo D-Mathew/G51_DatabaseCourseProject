@@ -101,7 +101,7 @@ module.exports = function(app, db){
             res.status(200).json({ message: "User registered successfully", data: registerInfo });
         }
         catch {
-            console.log("Unable to get Request")
+            console.log("Unable to register")
         }
     })
     
@@ -160,7 +160,7 @@ module.exports = function(app, db){
                 const bcrypt = require('bcrypt');
                 const match = await bcrypt.compare(password, user.hashed_password);
                 if (match) {
-                    return res.status(200).json({ message: "Login successful", data: { email: user.email, type: type } }); // Optionally return type
+                    return res.status(200).json({ message: "Login successful", data: { email: user.email, type: type, id: user.customerid } }); // Optionally return type
                 } else {
                 }
             } else if (type === 'employee') {
@@ -178,20 +178,6 @@ module.exports = function(app, db){
                 }
             } else {
                 return res.status(400).json({ message: "Invalid login type" });
-            }
-    
-            const { rows } = await db.query(query, [email]);
-            const user = rows[0];
-    
-            if (!user) {
-                return res.status(404).json({ message: "User not found" });
-            }
-            const bcrypt = require('bcrypt');
-            const match = await bcrypt.compare(password, user.hashed_password);
-            if (match) {
-                res.status(200).json({ message: "Login successful", data: { email: user.email, type: type } }); // Optionally return type
-            } else {
-                res.status(401).json({ message: "Invalid credentials" });
             }
         } catch (err) {
             console.error("Error during login:", err);
@@ -296,6 +282,18 @@ module.exports = function(app, db){
         }
         catch (error) {
             console.error("Error fetching hotel details:", error)
+        }
+    })
+
+    app.post('/api/bookRoom', async (req, res) => {
+        try {
+            const bookingDetails = req.body;
+            console.log("sick");
+            const result = await db.query("INSERT INTO project.bookings_rentings(roomid, hotelid, customerid, booking_renting, startdate, enddate, card_no, card_expiry, card_cvv) VALUES ($1, $2, $3, 'booking', $4, $5, $6, $7, $8);", [bookingDetails.roomid, bookingDetails.hotelid, bookingDetails.customerid, bookingDetails.startdate, bookingDetails.enddate, bookingDetails.card_no, bookingDetails.card_expiry, bookingDetails.card_cvv]);
+            res.status(200).json({ message: "User registered successfully", data: bookingDetails });
+        }
+        catch (error) {
+            console.error("Error Booking", error)
         }
     })
 

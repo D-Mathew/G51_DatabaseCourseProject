@@ -12,7 +12,7 @@ const HotelCard = (hotel_info) => {
         try {
             const response = await apis.post(`/getHotelDetails/${hotel_info.data.hotelid}`, dates);
             console.log(response.data); // Handle the response data
-            navigate(`/hotels/${hotel_info.data.hotelid}`, {state: {search: response.data}})
+            navigate(`/hotels/${hotel_info.data.hotelid}`, {state: {search: response.data, hotelId: hotel_info.data.hotelid}})
         }
         catch (error){
             console.error("Error Fetching Hotel Details", error)
