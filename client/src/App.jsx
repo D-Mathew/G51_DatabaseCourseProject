@@ -11,7 +11,7 @@ import Profile from './routes/Profile.jsx'
 import "./static/styles/main.css"
 import Hotels from './routes/Hotels.jsx'
 import { AuthProvider } from './AuthContext.js';
-import { DateProvider } from './components/DateContext.jsx'
+import { DateProvider } from './DateContext.js'
 
 
 
