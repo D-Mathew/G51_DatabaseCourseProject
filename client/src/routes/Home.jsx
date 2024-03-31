@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react'
-import "../static/styles/intro.css"
 import {useNavigate} from 'react-router-dom'
 import { useDates } from '../DateContext'
 import apis from '../apis'

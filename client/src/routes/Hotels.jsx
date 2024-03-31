@@ -1,49 +1,45 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import FilterHotel from '../components/FilterHotel'
 import HotelCard from '../components/HotelCard';
 import { useLocation } from 'react-router-dom';
+import apis from '../apis';
 
 export const Hotels = () => {
     const location = useLocation();
-    console.log(location)
+    // console.log(location)
     const {search} = location.state || {}; // Empty obj if no state
-    console.log(search)
+    // console.log(search)
 
-    const [filteredData, setFilteredData] = useState([]); // Data to be rendered, initially empty
+    const [hotelData, setHotelData] = useState(search ? search.data : []); // Data to be rendered, initially empty
 
-    // Dummy data for illustration
-    const data = [
-        { name: 'Item 1', type: 'wifi' },
-        { name: 'Item 2', type: 'tv' },
-        { name: 'Item 3', type: 'minibar' },
-        // Add more items as needed
-    ];
-
-    const handleFilterChange = (filters) => {
-        // Filter your data based on the selected filters
-        const newFilteredData = data.filter(item => 
-            (!filters.wifi || item.type === 'wifi') &&
-            (!filters.tv || item.type === 'tv') &&
-            (!filters.minibar || item.type === 'minibar')
-        );
-        setFilteredData(newFilteredData);
+    // Handler to be passed to FilterHotel
+    const handleFilterChange = async (filters) => {
+        try {
+            console.log(hotelData)
+            // Assuming your backend endpoint expects filters as query parameters
+            const response = await apis.post('/hotelResults', filters);
+            console.log(response.data.data)
+            setHotelData(response.data.data); // Update state with fetched data
+        } catch (error) {
+            console.error('Fetching filtered data failed:', error);
+            // Handle error (e.g., show error message)
+        }
     };
+
+    // useEffect(() => {
+    //     handleFilterChange(filteredData);
+    // }, [hotelData])
 
     const hotelCards = [];
 
     // For loop to create multiple hotelCard Components
-    for (let i = 0; i < search.data.length; i++) {
-        hotelCards.push(<HotelCard key={i} data={search.data[i]}/>);
+    for (let i = 0; i < hotelData.length; i++) {
+        hotelCards.push(<HotelCard key={i} data={hotelData[i]}/>);
     }
 
     return (
         <div className='container'>
             <FilterHotel onFilterChange={handleFilterChange} />
-            <ul>
-                {filteredData.map(item => (
-                    <li key={item.name}>{item.name}</li>
-                ))}
-            </ul>
             <h2 className='mb-5'>Available Hotels</h2>
             {hotelCards}
         </div>

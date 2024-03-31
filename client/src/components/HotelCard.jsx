@@ -1,12 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../static/styles/hotelcard.css"
 import { useDates } from "../DateContext";
 import apis from "../apis";
 
 const HotelCard = (hotel_info) => {
     const {dates} = useDates();
-    console.log(dates)
     const navigate = useNavigate();
     const handleHotelSelect = async () => {
         try {
@@ -22,13 +20,11 @@ const HotelCard = (hotel_info) => {
 
     return (
         <div className="card mb-5">
-            <div className="card-header">
-                Featured
-            </div>
             <div className="card-body">
-                <h5 className="card-title">Special title treatment</h5>
-                <p className="card-text">Hotel id: {hotel_info.data.hotelid}</p>
-                <p className="card-text">Available Rooms: {hotel_info.data.available_rooms}</p>
+                <h5 className="card-title">{hotel_info.data.name}</h5>
+                <p className="card-text">Ratings: {hotel_info.data.ratings}/10</p>
+                <p className="card-text">Number of Rooms: {hotel_info.data.noofrooms}</p>
+                <p className="card-text">Address: {hotel_info.data.streetnum} {hotel_info.data.streetname}, {hotel_info.data.city}, {hotel_info.data.state}, {hotel_info.data.zipcode}</p>
                 <div className="btn btn-primary" onClick={handleHotelSelect}>View Details</div>
             </div>
         </div>
