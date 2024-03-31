@@ -35,24 +35,40 @@ export const LoginRegister = () => {
       setRegisterInfo({ ...registerInfo, [name]: value });
   };
   
-  const handleLoginSubmit = async (e) => {
-      e.preventDefault();
-      console.log('Logging in as:', loginType);
-      try {
-        const response = await axios.post('http://localhost:4000/api/login', loginInfo);
-        if (response.status === 200) {
-          login(loginInfo.email); // Log in the user upon successful response
-          navigate('/'); // Navigate to home or another page as intended
-        } else {
-          // Handle any responses other than status 200 here, if necessary
-          console.error('Login failed with status:', response.status);
-        }
-      } catch (err) {
-          console.error('Login error:', err);
-          setError(err.response?.data?.message || 'Failed to log in');
-      }
+    // const handleLoginSubmit = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         const response = await axios.post('http://localhost:4000/api/login', loginInfo);
+    //         if (response.status === 200) {
+    //             login(response.data.email, response.data.role); // Use the role from the response
+    //             navigate('/');
+    //         } else {
+    //             console.error('Login failed with status:', response.status);
+    //         }
+    //     } catch (err) {
+    //         console.error('Login error:', err);
+    //         setError(err.response?.data?.message || 'Failed to log in');
+    //     }
+    // };
 
-  };
+    const handleLoginSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const endpoint = `/api/login/${loginType}`; // Use loginType in the endpoint
+            const response = await axios.post(`http://localhost:4000${endpoint}`, loginInfo);
+            if (response.status === 200) {
+                login(loginInfo.email, loginType); // Optionally, handle roles if needed
+                navigate('/');
+            } else {
+                console.error('Login failed with status:', response.status);
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            setError(err.response?.data?.message || 'Failed to log in');
+        }
+    };
+    
+
 
   const handleRegisterSubmit = async (e) => {
       e.preventDefault();

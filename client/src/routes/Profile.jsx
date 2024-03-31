@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import { useAuth } from '../AuthContext'; 
 
-export const Profile = () => {
+export const UpdateProfile = () => {
   const [error, setError] = useState(''); // State to store error message
   const [loginType, setLoginType] = useState('customer');
   const [loginInfo, setLoginInfo] = useState({ email: '', password: '' });
@@ -25,48 +25,49 @@ export const Profile = () => {
 
   const navigate = useNavigate();
 
-  const handleLoginChange = (e) => {
-      const { name, value } = e.target;
-      setLoginInfo({ ...loginInfo, [name]: value });
-  };
+//   const handleLoginChange = (e) => {
+//       const { name, value } = e.target;
+//       setLoginInfo({ ...loginInfo, [name]: value });
+//   };
 
   const handleRegisterChange = (e) => {
       const { name, value } = e.target;
       setRegisterInfo({ ...registerInfo, [name]: value });
   };
   
-  const handleLoginSubmit = async (e) => {
+  const handleRegisterSubmit = async (e) => {
       e.preventDefault();
-      console.log('Logging in as:', loginType);
+      console.log('Updating as', loginType);
       try {
-        const response = await axios.post('http://localhost:4000/api/login', loginInfo);
+        const endpoint = `/api/update/${loginType}`; // Use loginType in the endpoint
+        const response = await axios.post(`http://localhost:4000${endpoint}`, registerInfo);
         if (response.status === 200) {
-          login(loginInfo.email); // Log in the user upon successful response
+        //   login(loginInfo.email); // Log in the user upon successful response
           navigate('/'); // Navigate to home or another page as intended
         } else {
           // Handle any responses other than status 200 here, if necessary
-          console.error('Login failed with status:', response.status);
+          console.error('Update failed with status:', response.status);
         }
       } catch (err) {
-          console.error('Login error:', err);
-          setError(err.response?.data?.message || 'Failed to log in');
+          console.error('Update error:', err);
+          setError(err.response?.data?.message || 'Failed to Update');
       }
 
   };
 
-  const handleRegisterSubmit = async (e) => {
-      e.preventDefault();
-      console.log('Registering new customer');
-      try {
-        const response = await axios.post('http://localhost:4000/api/register', registerInfo);
-        console.log(response);
-        // if (response) {
-        //   navigate('/')
-        // }
-      } catch (err) {
-          setError(err.response?.data?.message || 'Fail to register user');
-      }
-  };
+//   const handleRegisterSubmit = async (e) => {
+//       e.preventDefault();
+//       console.log('Registering new customer');
+//       try {
+//         const response = await axios.post('http://localhost:4000/api/register', registerInfo);
+//         console.log(response);
+//         // if (response) {
+//         //   navigate('/')
+//         // }
+//       } catch (err) {
+//           setError(err.response?.data?.message || 'Fail to register user');
+//       }
+//   };
   return (
     <div className="container mt-5">
       <div className="row">
@@ -136,4 +137,4 @@ export const Profile = () => {
   )
 }
 
-export default Profile
+export default UpdateProfile;

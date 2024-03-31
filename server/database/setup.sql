@@ -479,6 +479,8 @@ VALUES
 (199, 40, 465, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'Sea View', TRUE, ''),
 (200, 40, 515, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Sea View', TRUE, '');
 
+INSERT INTO employees (fullname, address, ssn_sin, position, hashed_password, email) VALUES 
+('Amy', '155 Somerset', '1234', 'manager', 'awd', 'amy@gmail.com');
 
 SET search_path = project;
 
