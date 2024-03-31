@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../static/styles/hotelcard.css"
-import { useDates } from "./DateContext";
+import { useDates } from "../DateContext";
 import apis from "../apis";
 
 const HotelCard = (hotel_info) => {

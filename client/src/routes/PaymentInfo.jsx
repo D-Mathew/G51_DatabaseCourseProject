@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import { useLocation, useParams } from 'react-router-dom';
-import { useDates } from '../components/DateContext';
+import { useDates } from '../DateContext';
 
 export const PaymentInfo = () => {
     const location = useLocation();
