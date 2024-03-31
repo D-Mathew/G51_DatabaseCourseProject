@@ -27,7 +27,7 @@ const App = () => {
                 <Route exact path='/hotels' Component={Hotels}></Route>
                 <Route exact path='/hotels/:id' Component={Rooms}></Route>
                 <Route exact path='/bookings' Component={Bookings}></Route>
-                <Route exact path='/paymentInfo' Component={PaymentInfo}></Route>
+                <Route exact path='/paymentInfo/:id' Component={PaymentInfo}></Route>
                 <Route exact path='/showBookings' Component={ShowBookings}></Route>
             </Routes>
         </Router>
