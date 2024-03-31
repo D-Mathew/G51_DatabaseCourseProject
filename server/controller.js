@@ -1,17 +1,82 @@
 module.exports = function(app, db){
-    app.get('/', async (req, res) => {
+    app.get('/api/getbooking', async (req, res) => {
+        // Extract the email from the query parameters
+        const { email } = req.query;
+    
+        // Check if the email is provided
+        if (!email) {
+            return res.status(400).json({ status: "Error", message: "Email is required." });
+        }
+    
         try {
-            const results = await db.query("select * from project.bookings_rentings")
+            await db.query("SET search_path = 'project'");
+            const results = await db.query(`
+                SELECT 
+                    h.streetnum, 
+                    h.streetname, 
+                    h.apartmentnum, 
+                    h.zipcode,  
+                    h.phonenumber, 
+                    b.bookingid, 
+                    b.startdate, 
+                    b.enddate 
+                FROM 
+                    bookings_rentings b 
+                    INNER JOIN customers c ON b.customerid = c.customerid
+                    INNER JOIN rooms r ON b.roomid = r.roomid 
+                    INNER JOIN hotels h ON r.hotelid = h.hotelid 
+                WHERE 
+                    c.email = $1;`, [email]); // Use parameterized query to prevent SQL injection
+    
             res.status(200).json({
-                "status": "Success",
+                status: "Success",
                 data: results.rows,
-            })
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ status: "Error", message: "Failed to fetch bookings." });
         }
-        catch (err) {
-            console.log(err)
-        }
-
     });
+
+    app.get('/api/getallbookings', async (req, res) => {
+        // Extract the email from the query parameters
+        const { email } = req.query;
+    
+        // Check if the email is provided
+        if (!email) {
+            return res.status(400).json({ status: "Error", message: "Email is required." });
+        }
+    
+        try {
+            await db.query("SET search_path = 'project'");
+            const results = await db.query(`
+                SELECT 
+                    h.streetnum, 
+                    h.streetname, 
+                    h.apartmentnum, 
+                    h.zipcode,  
+                    h.phonenumber, 
+                    b.bookingid, 
+                    b.startdate, 
+                    b.enddate 
+                FROM 
+                    bookings_rentings b 
+                    INNER JOIN customers c ON b.customerid = c.customerid
+                    INNER JOIN rooms r ON b.roomid = r.roomid 
+                    INNER JOIN hotels h ON r.hotelid = h.hotelid 
+                WHERE 
+                    c.email = $1;`, [email]); // Use parameterized query to prevent SQL injection
+    
+            res.status(200).json({
+                status: "Success",
+                data: results.rows,
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ status: "Error", message: "Failed to fetch bookings." });
+        }
+    });
+    
 
     app.post('/api/register', async(req, res) => {
         try {
