@@ -9,7 +9,7 @@ const RoomCard = (room_info) => {
     const navigate = useNavigate();
     const handleRoomBooking = async () => {
         try {
-            const response = await apis.get(`/bookRoom/${room_info.data.roomid}`);
+            const response = await apis.post(`/bookRoom/${room_info.data.roomid}`, room_info);
             console.log(response.data); // Handle the response data
             navigate(`/paymentInfo/${room_info.data.roomid}`, {state: {search: response.data}})
         } 
@@ -23,8 +23,9 @@ const RoomCard = (room_info) => {
                 Featured
             </div>
             <div className="card-body">
-                <h5 className="card-title">Special title treatment</h5>
-                <p className="card-text">Room id: {room_info.data.roomid}</p>
+                <h5 className="card-title">{room_info.data.capacity} Room</h5>
+                <p className="card-text">{room_info.data.view}</p>
+                <p className="card-text">Amenities: {room_info.data.amenities}</p>
                 <p className="card-text">Price per night: ${room_info.data.price}</p>
                 <div className="btn btn-primary" onClick={handleRoomBooking}>Book</div>
             </div>
