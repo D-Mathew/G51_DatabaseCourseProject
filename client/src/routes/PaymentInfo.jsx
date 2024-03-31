@@ -2,7 +2,6 @@ import React, {useState} from 'react'
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import { useDates } from '../DateContext';
-import { useNavigate } from 'react-router-dom';
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import apis from '../apis';
@@ -17,7 +16,7 @@ export const PaymentInfo = () => {
     let { id } = useParams();
     const { customerID } = useAuth();
     const {dates} = useDates();
-    const nightlyRate = search.data.price; // Example rate, adjust as needed
+    const nightlyRate = search.price; // Example rate, adjust as needed
     const calculateNights = (startDate, endDate) => {
       const start = new Date(startDate);
       const end = new Date(endDate);
