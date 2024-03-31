@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 
 export const Hotels = () => {
     const location = useLocation();
-    // console.log(location)
+    console.log(location)
     const {search} = location.state || {}; // Empty obj if no state
     console.log(search)
 

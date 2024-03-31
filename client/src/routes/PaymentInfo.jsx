@@ -1,19 +1,57 @@
 import React, {useState} from 'react'
+import { useLocation, useParams } from 'react-router-dom';
+import { useDates } from '../components/DateContext';
 
 export const PaymentInfo = () => {
-    const [cardNumber, setCardNumber] = useState('');
-    const [expiryDate, setExpiryDate] = useState('');
-    const [cvv, setCvv] = useState('');
+    const location = useLocation();
+    const {search} = location.state|| {}; // Empty obj if no state  
+    // console.log(search)
+    let { id } = useParams();
+
+    const {dates} = useDates();
+    console.log(dates)
+    const nightlyRate = 100; // Example rate, adjust as needed
+    const calculateNights = (startDate, endDate) => {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
+    };
+  
+    const totalNights = calculateNights(dates.startDate, dates.endDate);
+    const totalPrice = totalNights * nightlyRate;
+
+    const [paymentInfo, setPaymentInfo] = useState({
+        cardNumber: '',
+        expiryDate: '',
+        cvv: '',
+    })
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setPaymentInfo({ 
+            ...paymentInfo, 
+            [name]: value 
+        });
+
+    };
 
     const handleSubmit = (event) => {
         event.preventDefault();
         // Here, add what you want to do with the form data.
-        console.log({ cardNumber, expiryDate, cvv });
+        console.log(paymentInfo.cardNumber, paymentInfo.expiryDate, paymentInfo.cvv);
     };
     
     return (
         <div className="container mt-4">
+            <h2>Room Information</h2>
+            <p>Stay Period: {dates.startDate} to {dates.endDate}</p>
+            <p>Total Price: ${totalPrice}</p>
+
+            <hr />
             <h2>Payment Information</h2>
+
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="cardNumber" className="form-label">Credit Card Number</label>
@@ -21,8 +59,9 @@ export const PaymentInfo = () => {
                         type="text"
                         className="form-control"
                         id="cardNumber"
-                        value={cardNumber}
-                        onChange={(e) => setCardNumber(e.target.value)}
+                        name='cardNumber'
+                        value={paymentInfo.cardNumber}
+                        onChange={handleChange}
                         placeholder="1234 5678 9123 4567"
                         maxLength="19"
                         required
@@ -34,8 +73,9 @@ export const PaymentInfo = () => {
                         type="text"
                         className="form-control"
                         id="expiryDate"
-                        value={expiryDate}
-                        onChange={(e) => setExpiryDate(e.target.value)}
+                        name='expiryDate'
+                        value={paymentInfo.expiryDate}
+                        onChange={handleChange}
                         placeholder="MM/YY"
                         maxLength="5"
                         required
@@ -47,8 +87,9 @@ export const PaymentInfo = () => {
                         type="text"
                         className="form-control"
                         id="cvv"
-                        value={cvv}
-                        onChange={(e) => setCvv(e.target.value)}
+                        name='cvv'
+                        value={paymentInfo.cvv}
+                        onChange={handleChange}
                         placeholder="123"
                         maxLength="4"
                         required

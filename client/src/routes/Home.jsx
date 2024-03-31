@@ -1,7 +1,8 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import "../static/styles/intro.css"
 import {useNavigate} from 'react-router-dom'
-import axios from 'axios'
+import { useDates } from '../components/DateContext'
+import apis from '../apis'
 
 export const Home = () => {
   const today = new Date().toISOString().split('T')[0]
@@ -11,6 +12,7 @@ export const Home = () => {
     endDate: ''
   });
 
+  const {setDates}= useDates();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -30,13 +32,17 @@ export const Home = () => {
         };
       }
     });
-};
+  };
+
+  useEffect(() => {
+    setDates({ startDate: formData.startDate, endDate: formData.endDate });
+  }, [formData])
 
   const handleSearch = async (e) => {
       e.preventDefault();
       // Implement your search logic here
       try {
-        const response = await axios.post('http://localhost:4000/api/hotelResults', formData);
+        const response = await apis.post('/hotelResults', formData);
         console.log(response.data); // Handle the response data
         navigate('/hotels', { state: { search: response.data } });
       } catch (error) {

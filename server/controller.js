@@ -35,7 +35,8 @@ module.exports = function(app, db){
 
     app.post('/api/hotelResults', async (req, res) => {
         try {
-            const {destination, start, end} = req.body
+            const {destination, startDate, endDate} = req.body
+            console.log(destination, typeof(startDate), endDate)
             const result = await db.query(`
                 SELECT h.hotelid, COUNT(r.roomid) AS available_rooms
                 FROM project.hotels h
@@ -49,13 +50,47 @@ module.exports = function(app, db){
                 WHERE h.city = $3
                 
                 GROUP BY h.hotelid;
-            `, [start, end, destination])
+            `, [startDate, endDate, destination])
 
             console.log(result.rows)
             res.status(200).json({ message: "Succesfully Found Hotel Results", data: result.rows });
         }
-        catch {
-            console.log("Unable to get Request")
+        catch (error){
+            console.error("Unable to fetch list of hotels:", error)
         }
     }) 
+
+    app.post('/api/getHotelDetails/:id', async(req, res) => {
+        try {
+            const hotel_id = req.params.id
+            const {startDate, endDate} = req.body
+            console.log(typeof(startDate))
+            const result = await db.query(`
+                SELECT project.rooms.*
+                FROM project.rooms
+                WHERE hotelid = $1
+                AND roomid NOT IN (
+                    SELECT roomid
+                    FROM project.bookings_rentings b
+                    WHERE b.startdate <= $2
+                    AND b.enddate >= $3
+                );
+            `, [hotel_id, startDate, endDate])
+            console.log(result.rows)
+            res.status(200).json({message: "Successfully get Hotel Details", data: result.rows})
+        }
+        catch (error) {
+            console.error("Error fetching hotel details:", error)
+        }
+    })
+
+    app.get('/api/bookRoom/:id', async (req, res) => {
+        try {
+            const roomId = req.params.id
+            res.send(roomId)
+        }
+        catch (error) {
+            console.error("Error fetching Room Details", error)
+        }
+    })
 }
