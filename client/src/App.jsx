@@ -11,12 +11,15 @@ import Profile from './routes/Profile.jsx'
 import "./static/styles/main.css"
 import Hotels from './routes/Hotels.jsx'
 import { AuthProvider } from './AuthContext.js';
+import { DateProvider } from './components/DateContext.jsx'
+
 
 
 const App = () => {
     return <div>
-        <AuthProvider>
-        <Router> {/* Router Tag from import */}
+            <AuthProvider>
+            <DateProvider>
+            <Router> {/* Router Tag from import */}
             <Navbar />
             <Routes>
                 <Route exact path='/' Component={Home}></Route> {/* Navigate to '/' (From the server controller) and Load Component 'Home' from Home.jsx, Copy this Router Tag for each components*/}
@@ -26,9 +29,9 @@ const App = () => {
                 <Route exact path='/bookings' Component={Bookings}></Route>
                 <Route exact path='/paymentInfo' Component={PaymentInfo}></Route>
                 <Route exact path='/showBookings' Component={ShowBookings}></Route>
-                <Route exact path='/profile' Component={Profile}></Route>
             </Routes>
         </Router>
+        </DateProvider>
         </AuthProvider>
     </div>
 }
