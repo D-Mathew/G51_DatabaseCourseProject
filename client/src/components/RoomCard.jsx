@@ -23,9 +23,10 @@ const RoomCard = ({data, hotelId}) => {
                 Featured
             </div>
             <div className="card-body">
-                <h5 className="card-title">Special title treatment</h5>
-                <p className="card-text">Room id: {data.roomid}</p>
-                <p className="card-text">Price per night: ${data.price}</p>
+                <h5 className="card-title">{room_info.data.capacity} Room</h5>
+                <p className="card-text">{room_info.data.view}</p>
+                <p className="card-text">Amenities: {room_info.data.amenities}</p>
+                <p className="card-text">Price per night: ${room_info.data.price}</p>
                 <div className="btn btn-primary" onClick={handleRoomBooking}>Book</div>
             </div>
         </div>

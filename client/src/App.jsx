@@ -17,21 +17,21 @@ import { DateProvider } from './DateContext.js'
 
 const App = () => {
     return <div>
-            <AuthProvider>
+        <AuthProvider>
             <DateProvider>
-            <Router> {/* Router Tag from import */}
-            <Navbar />
-            <Routes>
-                <Route exact path='/' Component={Home}></Route> {/* Navigate to '/' (From the server controller) and Load Component 'Home' from Home.jsx, Copy this Router Tag for each components*/}
-                <Route exact path='/loginRegister' Component={LoginRegister}></Route>
-                <Route exact path='/hotels' Component={Hotels}></Route>
-                <Route exact path='/hotels/:id' Component={Rooms}></Route>
-                <Route exact path='/bookings' Component={Bookings}></Route>
-                <Route exact path='/paymentInfo/:id' Component={PaymentInfo}></Route>
-                <Route exact path='/showBookings' Component={ShowBookings}></Route>
-            </Routes>
-        </Router>
-        </DateProvider>
+                <Router> {/* Router Tag from import */}
+                    <Navbar />
+                    <Routes>
+                        <Route exact path='/' Component={Home}></Route> {/* Navigate to '/' (From the server controller) and Load Component 'Home' from Home.jsx, Copy this Router Tag for each components*/}
+                        <Route exact path='/loginRegister' Component={LoginRegister}></Route>
+                        <Route exact path='/hotels' Component={Hotels}></Route>
+                        <Route exact path='/hotels/:id' Component={Rooms}></Route>
+                        <Route exact path='/bookings' Component={Bookings}></Route>
+                        <Route exact path='/paymentInfo/:id' Component={PaymentInfo}></Route>
+                        <Route exact path='/showBookings' Component={ShowBookings}></Route>
+                    </Routes>
+                </Router>
+            </DateProvider>
         </AuthProvider>
     </div>
 }

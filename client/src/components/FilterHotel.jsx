@@ -1,107 +1,111 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import "../static/styles/filter.css"
+import { useDates } from "../DateContext";
 
 const FilterHotel = ({onFilterChange}) => {
+    const today = new Date().toISOString().split('T')[0]
+    const {dates, setDates}= useDates();
 
     const [filters, setFilters] = useState({
-        wifi: false,
-        tv: false,
-        minibar: false,
-        balcony: false,
-        desk: false,
-        kitchenette: false,
-        single: false,
-        double: false,
-        triple: false,
-        quad: false,
-        suite: false,
-        city: false,
-        sea: false,
-        garden: false,
-        mountain: false,
-        park: false,
-        price: 0,
+        destination: '',
+        startDate: dates.startDate,
+        endDate: dates.endDate,
+        capacity: [],
+        view: [],
+        price: 500,
     });
 
-    const [price, setPrice] = useState(500);
-
-    const handleCheckboxChange = (event) => {
+    const handleCapacityChange = (event) => {
         const { name, checked } = event.target;
-        setFilters({ ...filters, [name]: checked });
+        setFilters(prevFilters => {
+            const updatedCapacity = checked
+                ? [...prevFilters.capacity, name]
+                : prevFilters.capacity.filter(capacity => capacity !== name);
+
+            return {...prevFilters, capacity: updatedCapacity}
+        });
     };
+
+    const handleViewChange = (event) => {
+        const { name, checked } = event.target;
+        setFilters(prevFilters => {
+            const updatedView = checked
+                ? [...prevFilters.view, name]
+                : prevFilters.view.filter(view => view !== name);
+
+            return {...prevFilters, view: updatedView}
+        });
+    }
+
+    // Handler for the price range change
+    const handlePriceChange = (event) => {
+        const { name, value } = event.target;
+        setFilters(prevFilters => ({ ...prevFilters, [name]: Number(value) }));
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prevFormData => {
+          // When startDate changes, adjust endDate to ensure it's not before startDate
+          if (name === 'startDate' && prevFormData.endDate && prevFormData.endDate < value) {
+            return {
+              ...prevFormData,
+              [name]: value,
+              endDate: value, // Set endDate to startDate if endDate is earlier than the new startDate
+            };
+          } else {
+            return {
+              ...prevFormData,
+              [name]: value,
+            };
+          }
+        });
+      };
 
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevent form from submitting traditionally
         onFilterChange(filters); // Pass the filters back to the parent component
     };
 
+    useEffect(() => {
+        setDates({ startDate: filters.startDate, endDate: filters.endDate });
+      }, [filters])
+
     return (
         <form onSubmit={handleSubmit}>
             <div className="filter container mt-5 d-flex flex-column">
-                <div id="amenities" className="d-flex flex-column mb-3">
-                    <h5>Amenities</h5>
-                    <div id="amenities-options" className="d-flex flex-row gap-4">
-                        <div>
-                            <input
-                                type="checkbox"
-                                id="wifi"
-                                name="wifi"
-                                checked={filters.wifi}
-                                onChange={handleCheckboxChange}
-                            />
-                            <label htmlFor="wifi">Wifi</label>
-                        </div>
-                        <div>
-                            <input
-                                type="checkbox"
-                                id="tv"
-                                name="tv"
-                                checked={filters.tv}
-                                onChange={handleCheckboxChange}
-                            />
-                            <label htmlFor="tv">TV</label>
-                        </div>
-                        <div>
-                            <input
-                                type="checkbox"
-                                id="minibar"
-                                name="minibar"
-                                checked={filters.minibar}
-                                onChange={handleCheckboxChange}
-                            />
-                            <label htmlFor="minibar">Minibar</label>
-                        </div>
-                        <div>
-                            <input
-                                type="checkbox"
-                                id="balcony"
-                                name="balcony"
-                                checked={filters.balcony}
-                                onChange={handleCheckboxChange}
-                            />
-                            <label htmlFor="balcony">Balcony</label>
-                        </div>
-                        <div>
-                            <input
-                                type="checkbox"
-                                id="des"
-                                name="des"
-                                checked={filters.des}
-                                onChange={handleCheckboxChange}
-                            />
-                            <label htmlFor="des">Desk</label>
-                        </div>
-                        <div>
-                            <input
-                                type="checkbox"
-                                id="kitchenette"
-                                name="kitchenette"
-                                checked={filters.kitchenette}
-                                onChange={handleCheckboxChange}
-                            />
-                            <label htmlFor="kitchenette">Kitchenette</label>
-                        </div>
-                    </div>
+                <div id="destination" className="d-flex flex-column mb-3">
+                    <h5>Destination</h5>
+                    <input
+                        type="text"
+                        id="destination"
+                        name='destination'
+                        value={filters.destination}
+                        onChange={handleChange}
+                        placeholder="Enter your destination"
+                    />
+                </div>
+                <div id="startDate" className="d-flex flex-column mb-3">
+                    <h5>Start Date</h5>
+                    <input
+                        type="date"
+                        id="start-date"
+                        name='startDate'
+                        value={filters.startDate}
+                        min={today}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div id="endDate" className="d-flex flex-column mb-3">
+                    <h5>End Date</h5>
+                    <input
+                        type="date"
+                        id="end-Date"
+                        name='endDate'
+                        value={filters.endDate}
+                        min={today}
+                        onChange={handleChange}
+                    />
                 </div>
                 <div id="capactity" className="d-flex flex-column mb-3">
                     <h5>Capacity</h5>
@@ -110,9 +114,9 @@ const FilterHotel = ({onFilterChange}) => {
                             <input
                                 type="checkbox"
                                 id="single"
-                                name="single"
-                                checked={filters.single}
-                                onChange={handleCheckboxChange}
+                                name="Single"
+                                checked={filters.capacity.includes('Single')}
+                                onChange={handleCapacityChange}
                             />
                             <label htmlFor="single">Single</label>
                         </div>
@@ -120,9 +124,9 @@ const FilterHotel = ({onFilterChange}) => {
                             <input
                                 type="checkbox"
                                 id="double"
-                                name="double"
-                                checked={filters.double}
-                                onChange={handleCheckboxChange}
+                                name="Double"
+                                checked={filters.capacity.includes('Double')}
+                                onChange={handleCapacityChange}
                             />
                             <label htmlFor="double">Double</label>
                         </div>
@@ -130,9 +134,9 @@ const FilterHotel = ({onFilterChange}) => {
                             <input
                                 type="checkbox"
                                 id="triple"
-                                name="triple"
-                                checked={filters.triple}
-                                onChange={handleCheckboxChange}
+                                name="Triple"
+                                checked={filters.capacity.includes('Triple')}
+                                onChange={handleCapacityChange}
                             />
                             <label htmlFor="triple">Triple</label>
                         </div>
@@ -140,9 +144,9 @@ const FilterHotel = ({onFilterChange}) => {
                             <input
                                 type="checkbox"
                                 id="quad"
-                                name="quad"
-                                checked={filters.quad}
-                                onChange={handleCheckboxChange}
+                                name="Quad"
+                                checked={filters.capacity.includes('Quad')}
+                                onChange={handleCapacityChange}
                             />
                             <label htmlFor="quad">Quad</label>
                         </div>
@@ -151,8 +155,8 @@ const FilterHotel = ({onFilterChange}) => {
                                 type="checkbox"
                                 id="Suite"
                                 name="Suite"
-                                checked={filters.Suite}
-                                onChange={handleCheckboxChange}
+                                checked={filters.capacity.includes('Suite')}
+                                onChange={handleCapacityChange}
                             />
                             <label htmlFor="Suite">Suite</label>
                         </div>
@@ -165,9 +169,9 @@ const FilterHotel = ({onFilterChange}) => {
                             <input
                                 type="checkbox"
                                 id="city"
-                                name="city"
-                                checked={filters.city}
-                                onChange={handleCheckboxChange}
+                                name="City"
+                                checked={filters.view.includes('City')}
+                                onChange={handleViewChange}
                             />
                             <label htmlFor="city">City</label>
                         </div>
@@ -175,9 +179,9 @@ const FilterHotel = ({onFilterChange}) => {
                             <input
                                 type="checkbox"
                                 id="sea"
-                                name="sea"
-                                checked={filters.sea}
-                                onChange={handleCheckboxChange}
+                                name="Sea"
+                                checked={filters.view.includes('Sea')}
+                                onChange={handleViewChange}
                             />
                             <label htmlFor="sea">Sea</label>
                         </div>
@@ -185,9 +189,9 @@ const FilterHotel = ({onFilterChange}) => {
                             <input
                                 type="checkbox"
                                 id="garden"
-                                name="garden"
-                                checked={filters.garden}
-                                onChange={handleCheckboxChange}
+                                name="Garden"
+                                checked={filters.view.includes('Garden')}
+                                onChange={handleViewChange}
                             />
                             <label htmlFor="garden">Garden</label>
                         </div>
@@ -195,9 +199,9 @@ const FilterHotel = ({onFilterChange}) => {
                             <input
                                 type="checkbox"
                                 id="mountain"
-                                name="mountain"
-                                checked={filters.mountain}
-                                onChange={handleCheckboxChange}
+                                name="Mountain"
+                                checked={filters.view.includes('Mountain')}
+                                onChange={handleViewChange}
                             />
                             <label htmlFor="mountain">Mountain</label>
                         </div>
@@ -205,9 +209,9 @@ const FilterHotel = ({onFilterChange}) => {
                             <input
                                 type="checkbox"
                                 id="park"
-                                name="park"
-                                checked={filters.park}
-                                onChange={handleCheckboxChange}
+                                name="Park"
+                                checked={filters.view.includes('Park')}
+                                onChange={handleViewChange}
                             />
                             <label htmlFor="park">Park</label>
                         </div>
@@ -217,15 +221,15 @@ const FilterHotel = ({onFilterChange}) => {
                     <h5>Price per Night</h5>
                     <div id="price-options" className="d-flex flex-row gap-4">
                         <div>
-                            <label htmlFor="price">Price: ${price}</label>
+                            <label htmlFor="price">Price: ${filters.price}</label>
                             <input
                                 type="range"
                                 id="price"
                                 name="price"
                                 min="0"
                                 max="1000" // Adjust max value as needed
-                                value={price}
-                                onChange={(e) => setPrice(e.target.value)}
+                                value={filters.price}
+                                onChange={handlePriceChange}
                                 className="form-control-range"
                             />
                         </div>

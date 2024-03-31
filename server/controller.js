@@ -236,28 +236,72 @@ module.exports = function(app, db){
 
     app.post('/api/hotelResults', async (req, res) => {
         try {
-            const {destination, startDate, endDate} = req.body
-            console.log(destination, typeof(startDate), endDate)
-            const result = await db.query(`
-                SELECT h.hotelid, COUNT(r.roomid) AS available_rooms
-                FROM project.hotels h
-                LEFT JOIN project.rooms r ON h.hotelid = r.hotelid
+            const { destination, startDate, endDate, price, capacity, view } = req.body;
+            await db.query("SET search_path = 'project'");
+            let query = `
+                SELECT h.*, COUNT(r.roomid) AS available_rooms
+                FROM hotels h
+                LEFT JOIN rooms r ON h.hotelid = r.hotelid
                 AND r.roomid NOT IN (
                     SELECT b.roomid
-                    FROM project.bookings_rentings b
-                    WHERE b.startdate <= $1
-                    AND b.enddate >= $2
+                    FROM bookings_rentings b
+                    WHERE b.startdate <= '${startDate}'
+                    AND b.enddate >= '${endDate}'
                 )
-                WHERE h.city = $3
-                
-                GROUP BY h.hotelid;
-            `, [startDate, endDate, destination])
+                WHERE h.city = '${destination}'
+            `
 
-            console.log(result.rows)
-            res.status(200).json({ message: "Succesfully Found Hotel Results", data: result.rows });
-        }
-        catch (error){
-            console.error("Unable to fetch list of hotels:", error)
+            // Array to hold query parameters
+            // let queryParams = 
+
+            // Dynamically add conditions based on additional filters
+            if (price) {
+                query +=  ` AND r.price <= ${price}`;
+            }
+            if (capacity) {
+                console.log(capacity)
+                if (capacity.length > 0) {
+                    query +=  ` AND r.capacity IN ('${capacity[0]}'`;
+                    for (let i=1; i < capacity.length - 1; i++) {
+                        query += `,'${capacity[i]}' `
+                    }
+                    if (capacity.length - 1 !== 0) {
+                        query += `,'${capacity[capacity.length - 1]}')`
+                    }
+                    else {
+                        query += `)`
+                    }
+                }
+            }
+            if (view) {
+                // console.log(view[view.length - 1])
+                if (view.length > 0) {
+                    query +=  ` AND r.view IN ('${view[0]} View'`;
+                    for (let i=1; i < view.length - 1; i++) {
+                        query += `,'${view[i]} View'`
+                    }
+                    if (view.length - 1 !== 0) {
+                        query += `,'${view[view.length - 1]} View')`
+                    }
+                    else {
+                        query += `)`
+                    }
+                }
+            }
+
+            query +=  ` GROUP BY h.hotelid, h.name`;
+            console.log(query)
+
+            try {
+                const result = await db.query(query);
+                console.log(result.rows);
+                res.status(200).json({ message: "Succesfully Found Hotel Results", data: result.rows });
+            } catch (err) {
+                console.error(err.message);
+                res.status(500).send("Server error");
+            }
+        } catch (err) {
+            console.error("Error Fetching Hotel List, ", err)
         }
     }) 
 
@@ -285,6 +329,16 @@ module.exports = function(app, db){
         }
     })
 
+    app.get('/api/findFilteredHotels', async(req, res) => {
+        try {
+            const hotel_info = req.query
+            console.log(hotel_info)
+            res.send(hotel_info)
+        }
+        catch (error) {
+            console.error("Error fetching Room Details", error)
+        } 
+    })
     app.post('/api/bookRoom', async (req, res) => {
         try {
             const bookingDetails = req.body;
@@ -296,6 +350,7 @@ module.exports = function(app, db){
             console.error("Error Booking", error)
         }
     })
+    
     app.get('/api/availability', async (req, res) => {
         try {
             const result = await db.query("SELECT * FROM project.view_daily_room_availability");
@@ -320,11 +375,31 @@ module.exports = function(app, db){
 
     app.get('/api/bookRoom/:id', async (req, res) => {
         try {
-            const roomId = req.params.id
-            res.send(roomId)
+            const room_info = req.body
+            res.send(room_info)
         }
         catch (error) {
             console.error("Error fetching Room Details", error)
+        }
+    })
+
+    app.post('/api/confirmBooking/:id', async(req, res) => {
+        try {
+            const paymentinfo = req.body
+            res.send(paymentinfo)
+        }
+        catch (error) {
+            console.error("Error confirm booking details", error)
+        }
+    })
+
+    app.get('/api/findBookings', async (req, res) => {
+        try {
+            const hotelRoominfo = req.body
+            res.send(hotelRoominfo) 
+        }
+        catch (error) {
+            console.error("Error fetching bookings details")
         }
     })
 }
