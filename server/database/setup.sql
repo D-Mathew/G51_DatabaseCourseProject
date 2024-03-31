@@ -660,3 +660,25 @@ GROUP BY h.city;
 
 -- Refresh View everyday
 REFRESH MATERIALIZED VIEW view_daily_room_availability;
+
+
+
+CREATE OR REPLACE VIEW view_hotel_room_capacity AS
+SELECT 
+    h.hotelid, 
+	h.name,
+    SUM(CASE 
+            WHEN r.capacity = 'Single' THEN 1 
+            WHEN r.capacity = 'Double' THEN 2 
+            WHEN r.capacity = 'Triple' THEN 3 
+            WHEN r.capacity = 'Quad' THEN 4 
+            ELSE 0 
+        END) AS total_capacity
+FROM 
+    hotels h
+JOIN 
+    rooms r ON h.hotelid = r.hotelid
+GROUP BY 
+    h.hotelid, h.name;
+
+

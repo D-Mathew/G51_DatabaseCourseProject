@@ -296,6 +296,27 @@ module.exports = function(app, db){
             console.error("Error Booking", error)
         }
     })
+    app.get('/api/availability', async (req, res) => {
+        try {
+            const result = await db.query("SELECT * FROM project.view_daily_room_availability");
+            console.log(result.rows);
+            res.status(200).json({ message: "User registered successfully", data: result.rows });
+        }
+        catch (error) {
+            console.error("Error Booking", error)
+        }
+    })
+    app.get('/api/hotelCapacity/:id', async (req, res) => {
+        try {
+            const { id: hotelId } = req.params;
+            const result = await db.query('SELECT total_capacity FROM project.view_hotel_room_capacity WHERE hotelid=$1', [hotelId]);
+            console.log(result.rows);
+            res.status(200).json({ total_capacity: result.rows[0].total_capacity });
+        }
+        catch (error) {
+            console.error("Error Booking", error)
+        }
+    })
 
     app.get('/api/bookRoom/:id', async (req, res) => {
         try {
