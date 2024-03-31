@@ -4,18 +4,16 @@ CREATE TABLE IF NOT EXISTS project.bookings_rentings
 (
     bookingid BIGSERIAL PRIMARY KEY,
     roomid integer,
-    employeeid integer,
     customerid integer,
     booking_renting character varying(255) COLLATE pg_catalog."default",
     startdate date,
     enddate date,
+    card_no bigint,
+    card_expiry character varying COLLATE pg_catalog."default",
+    card_cvv bigint,
     CONSTRAINT bookings_rentings_pkey PRIMARY KEY (bookingid),
     CONSTRAINT bookings_rentings_customerid_fkey FOREIGN KEY (customerid)
         REFERENCES project.customers (customerid) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT bookings_rentings_employeeid_fkey FOREIGN KEY (employeeid)
-        REFERENCES project.employees (employeeid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT bookings_rentings_roomid_fkey FOREIGN KEY (roomid)
@@ -482,6 +480,9 @@ VALUES
 INSERT INTO employees (fullname, address, ssn_sin, position, hashed_password, email) VALUES 
 ('Amy', '155 Somerset', '1234', 'manager', 'awd', 'amy@gmail.com');
 
+INSERT INTO bookings_rentings (roomid, employeeid, customerid, booking_renting, startdate, enddate) VALUES (1, 1, 1, 'booking', '2024-12-12', '2024-12-30');
+
+
 SET search_path = project;
 
 -- SELECT * FROM hotels WHERE city = 'New York';
@@ -531,6 +532,24 @@ AND roomid NOT IN (
     AND enddate >= 'requested_start_date'
 );
 
+-- List bookings based on user's email
+SELECT 
+    h.streetnum, 
+    h.streetname, 
+    h.apartmentnum, 
+    h.zipcode,  
+    h.phonenumber, 
+    b.bookingid, 
+    b.startdate, 
+    b.enddate 
+FROM 
+    bookings_rentings b 
+    INNER JOIN customers c ON b.customerid = c.customerid -- Assuming every booking must have a customer
+    INNER JOIN rooms r ON b.roomid = r.roomid -- Assuming every booking is for a room
+    INNER JOIN hotels h ON r.hotelid = h.hotelid -- Assuming every room is in a hotel
+WHERE 
+    c.email = 'jiakang.wong00@gmail.com';
+    
 -- List rooms based on availability
 -- SELECT rooms.*
 -- FROM rooms

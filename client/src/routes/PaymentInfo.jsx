@@ -37,10 +37,20 @@ export const PaymentInfo = () => {
 
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        // Here, add what you want to do with the form data.
-        console.log(paymentInfo.cardNumber, paymentInfo.expiryDate, paymentInfo.cvv);
+    const handlePaymentSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(`http://localhost:4000/api/book`, paymentInfo);
+            if (response.status === 200) {
+                login(loginInfo.email, loginType); // Optionally, handle roles if needed
+                navigate('/');
+            } else {
+                console.error('Login failed with status:', response.status);
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            setError(err.response?.data?.message || 'Failed to log in');
+        }
     };
     
     return (
@@ -52,7 +62,7 @@ export const PaymentInfo = () => {
             <hr />
             <h2>Payment Information</h2>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handlePaymentSubmit}>
                 <div className="mb-3">
                     <label htmlFor="cardNumber" className="form-label">Credit Card Number</label>
                     <input
