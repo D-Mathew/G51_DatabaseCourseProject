@@ -168,43 +168,6 @@ module.exports = function(app, db){
         }
     })
     
-    // app.post('/api/login/:type', async(req, res) => {
-    //     try {
-    //         const type = req.params;
-            
-
-    //         const { email, password } = req.body;
-
-    //         // Query database for user by email
-    //         if (type = 'customer') {
-    //             const { rows } = await db.query('SELECT * FROM project.customers WHERE email = $1', [email]);
-    //         }
-    //         if (type = 'employee') {
-    //             const { rows } = await db.query('SELECT * FROM project.employees WHERE email = $1', [email]);
-    //         }
-
-    //         const user = rows[0];
-
-    //         if (!user) {
-    //             // User not found
-    //             return res.status(404).json({ message: "User not found" });
-    //         }
-
-    //         // Verify password
-    //         const bcrypt = require('bcrypt');
-    //         const match = await bcrypt.compare(password, user.hashed_password);
-    //         if (match) {
-    //             // Password matches, authentication successful
-    //             res.status(200).json({ message: "Login successful", data: { email: user.email } });
-    //         } else {
-    //             // Password does not match
-    //             res.status(401).json({ message: "Invalid credentials" });
-    //         }
-    //     } catch (err) {
-    //         console.error("Error during login:", err);
-    //         res.status(500).send("Server error during login");
-    //     }
-    //     }) 
 
     app.post('/api/login/:type', async(req, res) => {
         try {

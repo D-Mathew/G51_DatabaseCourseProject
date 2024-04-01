@@ -1,34 +1,19 @@
 CREATE SCHEMA IF NOT EXISTS project;
 
-CREATE TABLE IF NOT EXISTS project.bookings_rentings
+CREATE TABLE IF NOT EXISTS project.hotelchains
 (
-    bookingid BIGSERIAL PRIMARY KEY,
-    roomid integer,
-    customerid integer,
-    booking_renting character varying(255) COLLATE pg_catalog."default",
-    startdate date,
-    enddate date,
-    card_no bigint,
-    card_expiry character varying COLLATE pg_catalog."default",
-    card_cvv bigint,
-    CONSTRAINT bookings_rentings_pkey PRIMARY KEY (bookingid),
-    CONSTRAINT bookings_rentings_customerid_fkey FOREIGN KEY (customerid)
-        REFERENCES project.customers (customerid) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT bookings_rentings_roomid_fkey FOREIGN KEY (roomid)
-        REFERENCES project.rooms (roomid) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-)
-
-Set search_path = "project";
-ALTER TABLE bookings_rentings
-ADD COLUMN hotelid INTEGER,
-ADD CONSTRAINT fk_hotel
-FOREIGN KEY (hotelid)
-REFERENCES hotels(hotelid);
-
+    chainid BIGSERIAL PRIMARY KEY,
+    city character varying(255) COLLATE pg_catalog."default",
+    state character varying(255) COLLATE pg_catalog."default",
+    zipcode character varying(255) COLLATE pg_catalog."default",
+    streetnum character varying(255) COLLATE pg_catalog."default",
+    streetname character varying(255) COLLATE pg_catalog."default",
+    apartmentnum character varying(255) COLLATE pg_catalog."default",
+    noofhotels integer,
+    email character varying(255) COLLATE pg_catalog."default",
+    phonenumbers bigint,
+    CONSTRAINT unique_phonenumbers UNIQUE (phonenumbers)
+);
 
 CREATE TABLE IF NOT EXISTS project.chainscontact
 (
@@ -42,7 +27,7 @@ CREATE TABLE IF NOT EXISTS project.chainscontact
         REFERENCES project.hotelchains (phonenumbers) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
+);
 
 CREATE TABLE IF NOT EXISTS project.customers
 (
@@ -58,56 +43,9 @@ CREATE TABLE IF NOT EXISTS project.customers
     idnumber integer,
     registrationdate date,
     hashed_password character varying COLLATE pg_catalog."default" NOT NULL,
-    email character varying COLLATE pg_catalog."default",
-    CONSTRAINT customers_pkey PRIMARY KEY (customerid)
-)
+    email character varying COLLATE pg_catalog."default"
+);
 
-CREATE TABLE IF NOT EXISTS project.employees
-(
-    employeeid BIGSERIAL PRIMARY KEY,
-    hotelid integer,
-    fullname character varying(255) COLLATE pg_catalog."default",
-    address character varying(255) COLLATE pg_catalog."default",
-    ssn_sin character varying(255) COLLATE pg_catalog."default",
-    "position" character varying(255) COLLATE pg_catalog."default",
-    hashed_password character varying COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT employees_pkey PRIMARY KEY (employeeid),
-    CONSTRAINT employees_hotelid_fkey FOREIGN KEY (hotelid)
-        REFERENCES project.hotels (hotelid) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-)
-
-CREATE TABLE IF NOT EXISTS project.hotelchains
-(
-    chainid BIGSERIAL PRIMARY KEY,
-    city character varying(255) COLLATE pg_catalog."default",
-    state character varying(255) COLLATE pg_catalog."default",
-    zipcode character varying(255) COLLATE pg_catalog."default",
-    streetnum character varying(255) COLLATE pg_catalog."default",
-    streetname character varying(255) COLLATE pg_catalog."default",
-    apartmentnum character varying(255) COLLATE pg_catalog."default",
-    noofhotels integer,
-    email character varying(255) COLLATE pg_catalog."default",
-    phonenumbers bigint,
-    CONSTRAINT hotelchains_pkey PRIMARY KEY (chainid),
-    CONSTRAINT unique_phonenumbers UNIQUE (phonenumbers)
-)
-
-
-CREATE TABLE IF NOT EXISTS project.hotelcontacts
-(
-    hotelid integer,
-    phonenumber integer,
-    CONSTRAINT hotelcontacts_hotelid_fkey FOREIGN KEY (hotelid)
-        REFERENCES project.hotels (hotelid) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT hotelcontacts_phonenumber_fkey FOREIGN KEY (phonenumber)
-        REFERENCES project.hotels (phonenumber) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-)
 
 CREATE TABLE IF NOT EXISTS project.hotels
 (
@@ -124,13 +62,45 @@ CREATE TABLE IF NOT EXISTS project.hotels
     email character varying(255) COLLATE pg_catalog."default",
     phonenumber bigint,
     name character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT hotels_pkey PRIMARY KEY (hotelid),
     CONSTRAINT unique_phonenumber UNIQUE (phonenumber),
     CONSTRAINT hotels_chainid_fkey FOREIGN KEY (chainid)
         REFERENCES project.hotelchains (chainid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
+);
+
+CREATE TABLE IF NOT EXISTS project.employees
+(
+    employeeid BIGSERIAL PRIMARY KEY,
+    hotelid integer,
+    fullname character varying(255) COLLATE pg_catalog."default",
+    address character varying(255) COLLATE pg_catalog."default",
+    ssn_sin character varying(255) COLLATE pg_catalog."default",
+    "position" character varying(255) COLLATE pg_catalog."default",
+    hashed_password character varying COLLATE pg_catalog."default" NOT NULL,
+    email character varying COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT employees_hotelid_fkey FOREIGN KEY (hotelid)
+        REFERENCES project.hotels (hotelid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+
+
+CREATE TABLE IF NOT EXISTS project.hotelcontacts
+(
+    hotelid integer,
+    phonenumber integer,
+    CONSTRAINT hotelcontacts_hotelid_fkey FOREIGN KEY (hotelid)
+        REFERENCES project.hotels (hotelid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT hotelcontacts_phonenumber_fkey FOREIGN KEY (phonenumber)
+        REFERENCES project.hotels (phonenumber) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
 
 CREATE TABLE IF NOT EXISTS project.rooms
 (
@@ -142,24 +112,64 @@ CREATE TABLE IF NOT EXISTS project.rooms
     view character varying(255) COLLATE pg_catalog."default",
     canextend boolean,
     problems character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT rooms_pkey PRIMARY KEY (roomid),
     CONSTRAINT rooms_hotelid_fkey FOREIGN KEY (hotelid)
         REFERENCES project.hotels (hotelid) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
+);
 
-CREATE TABLE IF NOT EXISTS project.archived_bookings_rentings
+
+CREATE TABLE IF NOT EXISTS project.bookings_rentings
 (
     bookingid BIGSERIAL PRIMARY KEY,
     roomid integer,
-    employeeid integer,
     customerid integer,
     booking_renting character varying(255) COLLATE pg_catalog."default",
     startdate date,
     enddate date,
+    card_no bigint,
+    card_expiry character varying COLLATE pg_catalog."default",
+    card_cvv bigint,
+    CONSTRAINT bookings_rentings_customerid_fkey FOREIGN KEY (customerid)
+        REFERENCES project.customers (customerid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT bookings_rentings_roomid_fkey FOREIGN KEY (roomid)
+        REFERENCES project.rooms (roomid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+Set search_path = "project";
+ALTER TABLE bookings_rentings
+ADD COLUMN hotelid INTEGER,
+ADD CONSTRAINT fk_hotel
+FOREIGN KEY (hotelid)
+REFERENCES hotels(hotelid);
+
+
+
+CREATE TABLE IF NOT EXISTS project.archived_bookings_rentings
+(
+    bookingid integer NOT NULL,
+    roomid integer,
+    customerid integer,
+    booking_renting character varying(255) COLLATE pg_catalog."default",
+    startdate date,
+    enddate date,
+    card_no bigint,
+    card_expiry character varying COLLATE pg_catalog."default",
+    card_cvv bigint,
+    hotelid bigint,
     CONSTRAINT archived_bookings_rentings_pkey PRIMARY KEY (bookingid)
 )
+
+INSERT INTO project.HotelChains (chainid, city, state, zipcode, streetnum, streetname, apartmentnum, noofhotels, email, phonenumbers) VALUES
+(1, 'Bethesda', 'MD', '20814', '7707', 'Woodmont Ave', NULL, 8785, 'lss.moments@marriott-service.com', '1112223333'),
+(2, 'McLean', 'VA', '22102', '7930', 'Jones Branch Dr', NULL, 7530, 'tahelpdesk@hilton.com', '2223334444'),
+(3, 'Chicago', 'IL', '60606', '150', 'Riverside Plaza', NULL, 1350, 'worldofhyatt@hyatt.com', '3334445555'),
+(4, 'Atlanta', 'GA', '30346', '3', 'Ravinia Drive', NULL, 5400, 'help@ihg.com', '4445556666'),
+(5, 'Parsippany', 'NJ', '07054', '22', 'Sylvan Way', NULL, 9000, 'service@wyndham.com', '5556667777');
 
 
 -- Marriott Hotels (1-8)
@@ -247,7 +257,7 @@ VALUES
 (22, 5, 190, 'Wi-Fi, TV, Minibar, Safe', 'Double', 'Sea View', TRUE, ''),
 (23, 5, 240, 'Wi-Fi, TV, Minibar, Safe, Balcony', 'Triple', 'Sea View', FALSE, ''),
 (24, 5, 290, 'Wi-Fi, TV, Minibar, Safe, Balcony, Desk', 'Quad', 'Sea View', TRUE, ''),
-(25, 5, 340, 'Wi-Fi, TV, Minibar, Safe, Balcony, Desk, Kitchenette', 'Suite', 'Sea View', TRUE, '');
+(25, 5, 340, 'Wi-Fi, TV, Minibar, Safe, Balcony, Desk, Kitchenette', 'Suite', 'Sea View', TRUE, ''),
 -- Hotel 6 Rooms
 (26, 6, 135, 'Wi-Fi, TV', 'Single', 'City View', FALSE, ''),
 (27, 6, 185, 'Wi-Fi, TV, Minibar', 'Double', 'City View', TRUE, ''),
@@ -289,7 +299,7 @@ VALUES
 (52, 11, 220, 'Wi-Fi, TV, Minibar', 'Double', 'Mountain View', TRUE, ''),
 (53, 11, 270, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Mountain View', FALSE, ''),
 (54, 11, 320, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'City View', TRUE, ''),
-(55, 11, 370, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, '');
+(55, 11, 370, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, ''),
 -- Hotel 12 Rooms
 (56, 12, 175, 'Wi-Fi, TV', 'Single', 'Garden View', FALSE, ''),
 (57, 12, 225, 'Wi-Fi, TV, Minibar', 'Double', 'Garden View', TRUE, ''),
@@ -309,7 +319,7 @@ VALUES
 (67, 14, 235, 'Wi-Fi, TV, Minibar', 'Double', 'Mountain View', TRUE, ''),
 (68, 14, 285, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Mountain View', FALSE, ''),
 (69, 14, 335, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'Sea View', TRUE, ''),
-(70, 14, 385, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Sea View', TRUE, '');
+(70, 14, 385, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Sea View', TRUE, ''),
 -- Hotel 15 Rooms
 (71, 15, 190, 'Wi-Fi, TV', 'Single', 'City View', FALSE, ''),
 (72, 15, 240, 'Wi-Fi, TV, Minibar', 'Double', 'City View', TRUE, ''),
@@ -329,7 +339,7 @@ VALUES
 (82, 17, 250, 'Wi-Fi, TV, Minibar', 'Double', 'Mountain View', TRUE, ''),
 (83, 17, 300, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Mountain View', FALSE, ''),
 (84, 17, 350, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'City View', TRUE, ''),
-(85, 17, 400, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, '');
+(85, 17, 400, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, ''),
 -- Hotel 18 Rooms
 (86, 18, 205, 'Wi-Fi, TV', 'Single', 'Park View', FALSE, ''),
 (87, 18, 255, 'Wi-Fi, TV, Minibar', 'Double', 'Park View', TRUE, ''),
@@ -349,7 +359,7 @@ VALUES
 (97, 20, 265, 'Wi-Fi, TV, Minibar', 'Double', 'Mountain View', TRUE, ''),
 (98, 20, 315, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Mountain View', FALSE, ''),
 (99, 20, 365, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'Park View', TRUE, ''),
-(100, 20, 415, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Park View', TRUE, '');
+(100, 20, 415, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Park View', TRUE, ''),
 -- Hotel 21 Rooms
 (101, 21, 220, 'Wi-Fi, TV', 'Single', 'City View', FALSE, ''),
 (102, 21, 270, 'Wi-Fi, TV, Minibar', 'Double', 'City View', TRUE, ''),
@@ -369,7 +379,7 @@ VALUES
 (112, 23, 280, 'Wi-Fi, TV, Minibar', 'Double', 'Mountain View', TRUE, ''),
 (113, 23, 330, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Mountain View', FALSE, ''),
 (114, 23, 380, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'City View', TRUE, ''),
-(115, 23, 430, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, '');
+(115, 23, 430, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, ''),
 -- Hotel 24 Rooms
 (116, 24, 235, 'Wi-Fi, TV', 'Single', 'Garden View', FALSE, ''),
 (117, 24, 285, 'Wi-Fi, TV, Minibar', 'Double', 'Garden View', TRUE, ''),
@@ -389,7 +399,7 @@ VALUES
 (127, 26, 295, 'Wi-Fi, TV, Minibar', 'Double', 'Sea View', TRUE, ''),
 (128, 26, 345, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Sea View', FALSE, ''),
 (129, 26, 395, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'Mountain View', TRUE, ''),
-(130, 26, 445, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Mountain View', TRUE, '');
+(130, 26, 445, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Mountain View', TRUE, ''),
 -- Hotel 27 Rooms
 (131, 27, 250, 'Wi-Fi, TV', 'Single', 'City View', FALSE, ''),
 (132, 27, 300, 'Wi-Fi, TV, Minibar', 'Double', 'City View', TRUE, ''),
@@ -409,7 +419,7 @@ VALUES
 (142, 29, 310, 'Wi-Fi, TV, Minibar', 'Double', 'Mountain View', TRUE, ''),
 (143, 29, 360, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Mountain View', FALSE, ''),
 (144, 29, 410, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'City View', TRUE, ''),
-(145, 29, 460, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, '');
+(145, 29, 460, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, ''),
 -- Hotel 30 Rooms
 (146, 30, 265, 'Wi-Fi, TV', 'Single', 'Garden View', FALSE, ''),
 (147, 30, 315, 'Wi-Fi, TV, Minibar', 'Double', 'Garden View', TRUE, ''),
@@ -429,7 +439,7 @@ VALUES
 (157, 32, 325, 'Wi-Fi, TV, Minibar', 'Double', 'Mountain View', TRUE, ''),
 (158, 32, 375, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Mountain View', FALSE, ''),
 (159, 32, 425, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'City View', TRUE, ''),
-(160, 32, 475, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, '');
+(160, 32, 475, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, ''),
 -- Hotel 33 Rooms
 (161, 33, 280, 'Wi-Fi, TV', 'Single', 'City View', FALSE, ''),
 (162, 33, 330, 'Wi-Fi, TV, Minibar', 'Double', 'City View', TRUE, ''),
@@ -449,7 +459,7 @@ VALUES
 (172, 35, 340, 'Wi-Fi, TV, Minibar', 'Double', 'Mountain View', TRUE, ''),
 (173, 35, 390, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Mountain View', FALSE, ''),
 (174, 35, 440, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'City View', TRUE, ''),
-(175, 35, 490, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, '');
+(175, 35, 490, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'City View', TRUE, ''),
 -- Hotel 36 Rooms
 (176, 36, 295, 'Wi-Fi, TV', 'Single', 'Garden View', FALSE, ''),
 (177, 36, 345, 'Wi-Fi, TV, Minibar', 'Double', 'Garden View', TRUE, ''),
@@ -469,7 +479,7 @@ VALUES
 (187, 38, 355, 'Wi-Fi, TV, Minibar', 'Double', 'Sea View', TRUE, ''),
 (188, 38, 405, 'Wi-Fi, TV, Minibar, Balcony', 'Triple', 'Sea View', FALSE, ''),
 (189, 38, 455, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'Mountain View', TRUE, ''),
-(190, 38, 505, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Mountain View', TRUE, '');
+(190, 38, 505, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Mountain View', TRUE, ''),
 -- Hotel 39 Rooms
 (191, 39, 310, 'Wi-Fi, TV', 'Single', 'Park View', FALSE, ''),
 (192, 39, 360, 'Wi-Fi, TV, Minibar', 'Double', 'Park View', TRUE, ''),
@@ -484,10 +494,116 @@ VALUES
 (199, 40, 465, 'Wi-Fi, TV, Minibar, Balcony, Desk', 'Quad', 'Sea View', TRUE, ''),
 (200, 40, 515, 'Wi-Fi, TV, Minibar, Balcony, Desk, Kitchenette', 'Suite', 'Sea View', TRUE, '');
 
-INSERT INTO employees (fullname, address, ssn_sin, position, hashed_password, email) VALUES 
+INSERT INTO project.employees (fullname, address, ssn_sin, position, hashed_password, email) VALUES 
 ('Amy', '155 Somerset', '1234', 'manager', 'awd', 'amy@gmail.com');
 
-INSERT INTO bookings_rentings (roomid, employeeid, customerid, booking_renting, startdate, enddate) VALUES (1, 1, 1, 'booking', '2024-12-12', '2024-12-30');
+-- Trigger to automatically archive booking
+CREATE OR REPLACE FUNCTION archive_booking() 
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO archived_bookings_rentings SELECT * FROM project.bookings_rentings WHERE bookingid = OLD.bookingid;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_archive_booking
+BEFORE DELETE ON project.bookings_rentings
+FOR EACH ROW EXECUTE FUNCTION archive_booking();
+
+
+-- Set search path for the current session
+SET search_path = project;
+
+-- Define the function to increase room count
+CREATE OR REPLACE FUNCTION update_room_count()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE hotels SET noofrooms = noofrooms + 1 WHERE hotelid = NEW.hotelid;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Define the trigger for room addition
+CREATE TRIGGER trigger_room_added
+AFTER INSERT ON rooms
+FOR EACH ROW EXECUTE FUNCTION update_room_count();
+
+-- Define the function to decrease room count
+CREATE OR REPLACE FUNCTION decrease_room_count()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE hotels SET noofrooms = noofrooms - 1 WHERE hotelid = OLD.hotelid;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Define the trigger for room deletion
+CREATE TRIGGER trigger_room_deleted
+AFTER DELETE ON rooms
+FOR EACH ROW EXECUTE FUNCTION decrease_room_count();
+
+-- Define the materialized view for daily room availability
+CREATE MATERIALIZED VIEW view_daily_room_availability AS
+SELECT 
+    h.city, 
+    COUNT(r.roomid) AS available_rooms, 
+    CURRENT_DATE + INTERVAL '1 day' AS for_date
+FROM 
+    hotels h
+JOIN 
+    rooms r ON h.hotelid = r.hotelid
+WHERE 
+    r.roomid NOT IN (
+        SELECT 
+            b.roomid
+        FROM 
+            bookings_rentings b
+        WHERE 
+            CURRENT_DATE + INTERVAL '1 day' BETWEEN b.startdate AND b.enddate
+    )
+GROUP BY 
+    h.city;
+
+-- Define the view for hotel room capacity
+CREATE OR REPLACE VIEW view_hotel_room_capacity AS
+SELECT 
+    h.hotelid, 
+    h.name,
+    SUM(CASE 
+            WHEN r.capacity = 'Single' THEN 1 
+            WHEN r.capacity = 'Double' THEN 2 
+            WHEN r.capacity = 'Triple' THEN 3 
+            WHEN r.capacity = 'Quad' THEN 4 
+            WHEN r.capacity = 'Suite' THEN 5
+            ELSE 0 
+        END) AS total_capacity
+FROM 
+    hotels h
+JOIN 
+    rooms r ON h.hotelid = r.hotelid
+GROUP BY 
+    h.hotelid, h.name;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- -- Archive booking before deletion
+-- INSERT INTO archived_bookings_rentings (bookingid, roomid, customerid, startdate, enddate, ...)
+-- SELECT bookingid, roomid, customerid, startdate, enddate, ...
+-- FROM bookings_rentings
+-- WHERE bookingid = $1; -- Assuming $1 is the booking ID to be deleted
+
+-- INSERT INTO project.bookings_rentings (roomid, employeeid, customerid, booking_renting, startdate, enddate) VALUES (1, 1, 1, 'booking', '2024-12-12', '2024-12-30');
 
 
 SET search_path = project;
@@ -498,31 +614,31 @@ SELECT * FROM hotels WHERE city = 'New York';
 -- Count the number of rooms available in a specific hotelid:
 -- SELECT COUNT(*) FROM rooms WHERE hotelid = 1 AND is_available = TRUE;
 
-SELECT COUNT(*)
-FROM rooms
-WHERE hotel_id = 1 -- or any specific hotel_id
-AND room_id NOT IN (
-    SELECT room_id
-    FROM bookings
-    WHERE start_date <= 'requested_end_date'
-    AND end_date >= 'requested_start_date'
-);
+-- SELECT COUNT(*)
+-- FROM rooms
+-- WHERE hotel_id = 1 -- or any specific hotel_id
+-- AND room_id NOT IN (
+--     SELECT room_id
+--     FROM bookings
+--     WHERE start_date <= 'requested_end_date'
+--     AND end_date >= 'requested_start_date'
+-- );
 
--- List hotels and their room counts based on startdate, enddate and city (Aggregation):
--- SELECT hotelid, COUNT(roomid) AS total_rooms FROM rooms GROUP BY hotelid;
+-- -- List hotels and their room counts based on startdate, enddate and city (Aggregation):
+-- -- SELECT hotelid, COUNT(roomid) AS total_rooms FROM rooms GROUP BY hotelid;
 
-SELECT h.hotelid, COUNT(r.roomid) AS available_rooms
-FROM hotels h
-LEFT JOIN rooms r ON h.hotelid = r.hotelid
-AND r.roomid NOT IN (
-    SELECT b.roomid
-    FROM bookings_rentings b
-    WHERE b.startdate <= 'requested_end_date'
-    AND b.enddate >= 'requested_start_date'
-)
-WHERE h.city = 'requested_city'
+-- SELECT h.hotelid, COUNT(r.roomid) AS available_rooms
+-- FROM hotels h
+-- LEFT JOIN rooms r ON h.hotelid = r.hotelid
+-- AND r.roomid NOT IN (
+--     SELECT b.roomid
+--     FROM bookings_rentings b
+--     WHERE b.startdate <= 'requested_end_date'
+--     AND b.enddate >= 'requested_start_date'
+-- )
+-- WHERE h.city = 'requested_city'
 
-GROUP BY h.hotelid;
+-- GROUP BY h.hotelid;
 
 
 -- List hotels based on availability
@@ -587,52 +703,6 @@ WHERE
 
 -- EXECUTE booked()
 
--- Archive booking before deletion
-INSERT INTO archived_bookings_rentings (bookingid, roomid, customerid, startdate, enddate, ...)
-SELECT bookingid, roomid, customerid, startdate, enddate, ...
-FROM bookings_rentings
-WHERE bookingid = $1; -- Assuming $1 is the booking ID to be deleted
-
--- Trigger to automatically archive booking
-CREATE OR REPLACE FUNCTION archive_booking() 
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO archived_bookings_rentings SELECT * FROM bookings_rentings WHERE bookingid = OLD.bookingid;
-    RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_archive_booking
-BEFORE DELETE ON bookings_rentings
-FOR EACH ROW EXECUTE FUNCTION archive_booking();
-
-
--- Trigger to update room counts when new room added to hotel 
-CREATE OR REPLACE FUNCTION update_room_count()
-RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE hotels SET noofrooms = noofrooms + 1 WHERE hotelid = NEW.hotelid;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_room_added
-AFTER INSERT ON rooms
-FOR EACH ROW EXECUTE FUNCTION update_room_count();
-
-
--- Trigger to decrease room count when room deleted from hotel
-CREATE OR REPLACE FUNCTION decrease_room_count()
-RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE hotels SET noofrooms = noofrooms - 1 WHERE hotelid = OLD.hotelid;
-  RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_room_deleted
-AFTER DELETE ON rooms
-FOR EACH ROW EXECUTE FUNCTION decrease_room_count();
 
 
 
@@ -644,51 +714,5 @@ FOR EACH ROW EXECUTE FUNCTION decrease_room_count();
 -- WHERE r.is_available = TRUE
 -- GROUP BY h.city;
 
-
-
--- View to view available rooms per area per day
-CREATE MATERIALIZED VIEW view_daily_room_availability AS
-SELECT 
-    h.city, 
-    COUNT(r.roomid) AS available_rooms, 
-    CURRENT_DATE + INTERVAL '1 day' AS for_date
-FROM 
-    hotels h
-JOIN 
-    rooms r ON h.hotelid = r.hotelid
-WHERE 
-    r.roomid NOT IN (
-        SELECT 
-            b.roomid
-        FROM 
-            bookings_rentings b
-        WHERE 
-            CURRENT_DATE + INTERVAL '1 day' BETWEEN b.startdate AND b.enddate
-    )
-GROUP BY 
-    h.city;
-
--- Refresh View everyday
-REFRESH MATERIALIZED VIEW view_daily_room_availability;
-
-
-
-CREATE OR REPLACE VIEW view_hotel_room_capacity AS
-SELECT 
-    h.hotelid, 
-	h.name,
-    SUM(CASE 
-            WHEN r.capacity = 'Single' THEN 1 
-            WHEN r.capacity = 'Double' THEN 2 
-            WHEN r.capacity = 'Triple' THEN 3 
-            WHEN r.capacity = 'Quad' THEN 4 
-            ELSE 0 
-        END) AS total_capacity
-FROM 
-    hotels h
-JOIN 
-    rooms r ON h.hotelid = r.hotelid
-GROUP BY 
-    h.hotelid, h.name;
 
 
