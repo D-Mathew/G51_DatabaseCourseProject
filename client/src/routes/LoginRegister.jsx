@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import { useAuth } from '../AuthContext'; 
+import apis from '../apis';
 
 export const LoginRegister = () => {
   const [error, setError] = useState(''); // State to store error message
@@ -64,20 +65,16 @@ export const LoginRegister = () => {
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         try {
-            const endpoint = `/api/login/${loginType}`; // Use loginType in the endpoint
-            const response = await axios.post(`http://localhost:4000${endpoint}`, loginInfo);
-            if (response.status === 200) {
+            const endpoint = `/login/${loginType}`; // Use loginType in the endpoint
+            const response = await apis.post(`${endpoint}`, loginInfo);
                 console.log(response.data.data.id);
                 login(loginInfo.email, loginType, response.data.data.id); // Optionally, handle roles if needed
                 console.log('After Login - Context Values:');
-        console.log('Is Logged In:', isLoggedIn);
-        console.log('User Email:', userEmail);
-        console.log('User Role:', userRole);
-        console.log('Customer ID:', customerID);
-                navigate('/');
-            } else {
-                console.error('Login failed with status:', response.status);
-            }
+                console.log('Is Logged In:', isLoggedIn);
+                console.log('User Email:', userEmail);
+                console.log('User Role:', userRole);
+                console.log('Customer ID:', customerID);
+                navigate('/home');
         } catch (err) {
             console.error('Login error:', err);
             setError(err.response?.data?.message || 'Failed to log in');
@@ -90,11 +87,11 @@ export const LoginRegister = () => {
       e.preventDefault();
       console.log('Registering new customer');
       try {
-        const response = await axios.post('http://localhost:4000/api/register', registerInfo);
+        const response = await apis.post('/register', registerInfo);
         console.log(response);
-        // if (response) {
-        //   navigate('/')
-        // }
+        if (response) {
+          window.location.reload();
+        }
       } catch (err) {
           setError(err.response?.data?.message || 'Fail to register user');
       }

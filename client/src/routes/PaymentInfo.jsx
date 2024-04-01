@@ -61,10 +61,11 @@ export const PaymentInfo = () => {
 
         try {
             console.log(bookingDetails);
-            const response = await axios.post('http://localhost:4000/api/bookRoom', bookingDetails);
+            const response = await apis.post('/bookRoom', bookingDetails);
             if (response.status === 200) {
                 // Handle success, for example redirect to a success page or display a success message
-                navigate('/bookingSuccess', { state: { bookingDetails: response.data } }); // Adjust the path as necessary
+                alert("Booked Successfully")
+                navigate('/home', { state: { bookingDetails: response.data } }); // Adjust the path as necessary
             } else {
                 // Handle other HTTP statuses or failure scenarios
                 console.error('Booking failed with status:', response.status);

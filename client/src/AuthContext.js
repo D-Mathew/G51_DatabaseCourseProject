@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('userEmail', email);
         localStorage.setItem('userRole', role);
         localStorage.setItem('customerID', id); // Persist customerID
-        window.location.reload();
+        // window.location.reload();
         setIsLoggedIn(true);
         setUserEmail(email);
         setUserRole(role);
