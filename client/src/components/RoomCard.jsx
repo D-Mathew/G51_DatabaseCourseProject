@@ -1,18 +1,24 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import apis from '../apis'
-
+import { useAuth } from '../AuthContext'
 
 
 const RoomCard = ({data, hotelId}) => {
 
     const navigate = useNavigate();
+    const {isLoggedIn} = useAuth();
     const handleRoomBooking = async () => {
         try {
             // const response = await apis.get(`/bookRoom/${data.roomid}`);
             // console.log(response.data); // Handle the response data
             console.log(data)
-            navigate(`/paymentInfo/${data.roomid}`, {state: { search: data, hotelId: hotelId, roomId: data.roomid}})
+            if (isLoggedIn) {
+                navigate(`/paymentInfo/${data.roomid}`, {state: { search: data, hotelId: hotelId, roomId: data.roomid}})
+            }
+            else {
+                navigate('/loginRegister')
+            }
         } 
         catch (error){
             console.error("Error Fetching Hotel Details", error)

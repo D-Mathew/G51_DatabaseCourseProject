@@ -10,7 +10,7 @@ const Navbar = () => {
 
     const handleLogout = () => {
         logout(); // Logout function from AuthContext
-        navigate('/');
+        navigate('/home');
         // Add any additional logout logic here, e.g., redirecting the user
     };
 
@@ -38,7 +38,7 @@ const Navbar = () => {
     //     </nav>
     return (
         <nav>
-            <Link to="/" className='navlink'>Home</Link>
+            <Link to="/home" className='navlink'>Home</Link>
             {isLoggedIn && userRole === 'employee' && <Link to="/employeeSearchPage" className='navlink'>Customer Bookings</Link>}
             {isLoggedIn && userRole === 'customer' && <Link to="/bookings" className='navlink'>Customer Bookings</Link>}
             <Link to="/abouts" className='navlink'>About Us</Link>
