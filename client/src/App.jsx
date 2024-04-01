@@ -24,7 +24,8 @@ const App = () => {
                 <Router> {/* Router Tag from import */}
                     <Navbar />
                     <Routes>
-                        <Route exact path='/home' Component={Home}></Route> {/* Navigate to '/' (From the server controller) and Load Component 'Home' from Home.jsx, Copy this Router Tag for each components*/}
+                        <Route exact path='/' Component={Home}></Route> {/* Navigate to '/' (From the server controller) and Load Component 'Home' from Home.jsx, Copy this Router Tag for each components*/}
+                        <Route exact path='/home' Component={Home}></Route> 
                         <Route exact path='/loginRegister' Component={LoginRegister}></Route>
                         <Route exact path='/hotels' Component={Hotels}></Route>
                         <Route exact path='/hotels/:id' Component={Rooms}></Route>
