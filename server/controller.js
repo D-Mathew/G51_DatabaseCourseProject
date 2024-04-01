@@ -407,6 +407,7 @@ module.exports = function(app, db){
             const bookingDetails = req.body;
             console.log("sick");
             const result = await db.query("INSERT INTO project.bookings_rentings(roomid, hotelid, customerid, booking_renting, startdate, enddate, card_no, card_expiry, card_cvv) VALUES ($1, $2, $3, 'booking', $4, $5, $6, $7, $8);", [bookingDetails.roomid, bookingDetails.hotelid, bookingDetails.customerid, bookingDetails.startdate, bookingDetails.enddate, bookingDetails.card_no, bookingDetails.card_expiry, bookingDetails.card_cvv]);
+            await db.query('REFRESH MATERIALIZED VIEW project.view_daily_room_availability;');
             res.status(200).json({ message: "User registered successfully", data: bookingDetails });
         }
         catch (error) {
