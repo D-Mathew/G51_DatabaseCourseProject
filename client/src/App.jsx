@@ -7,6 +7,8 @@ import Home from './routes/Home.jsx'
 import LoginRegister from './routes/LoginRegister.jsx'
 import PaymentInfo from './routes/PaymentInfo.jsx'
 import ShowBookings from './routes/ShowBookings.jsx'
+import BookingDetailsPage from './routes/BookingDetailsPage.jsx'
+import EmployeeSearchPage from './routes/EmployeeSearchPage.jsx'
 import Profile from './routes/Profile.jsx'
 import "./static/styles/main.css"
 import Hotels from './routes/Hotels.jsx'
@@ -29,6 +31,8 @@ const App = () => {
                         <Route exact path='/bookings' Component={Bookings}></Route>
                         <Route exact path='/paymentInfo/:id' Component={PaymentInfo}></Route>
                         <Route exact path='/showBookings' Component={ShowBookings}></Route>
+                        <Route exact path='/booking/:bookingId' Component={BookingDetailsPage}></Route>
+                        <Route exact path='/employeeSearchPage' Component={EmployeeSearchPage}></Route>
                     </Routes>
                 </Router>
             </DateProvider>

@@ -38,6 +38,69 @@ module.exports = function(app, db){
         }
     });
 
+    app.get('/api/booking/:bookingId', async (req, res) => {
+        const { bookingId } = req.params;
+    
+    
+        try {
+            await db.query("SET search_path = 'project'");
+            const results = await db.query(`
+                SELECT 
+                    h.streetnum, 
+                    h.streetname, 
+                    h.apartmentnum, 
+                    h.zipcode,  
+                    h.phonenumber, 
+                    b.bookingid, 
+                    b.startdate, 
+                    b.enddate,
+                    c.fullname
+                FROM 
+                    bookings_rentings b 
+                    INNER JOIN customers c ON b.customerid = c.customerid
+                    INNER JOIN rooms r ON b.roomid = r.roomid 
+                    INNER JOIN hotels h ON r.hotelid = h.hotelid 
+                WHERE 
+                    b.bookingid = $1;`, [bookingId]) // Use parameterized query to prevent SQL injection
+    
+            res.status(200).json({
+                status: "Success",
+                data: results.rows[0],
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ status: "Error", message: "Failed to fetch bookings." });
+        }
+    });
+
+    // Update booking status
+    app.put('/api/update-booking/:bookingId', async (req, res) => {
+        const { bookingId } = req.params;
+        try {
+            await db.query("SET search_path = 'project'");
+            await db.query('UPDATE bookings_rentings SET booking_renting = \'renting\' WHERE bookingid = $1', [bookingId]);
+            res.json({ message: 'Booking updated successfully' });
+            } catch (error) {
+            res.status(500).json({ message: 'Internal server error' });
+            }
+    });
+
+    app.post('/api/process-payment/:bookingId', async (req, res) => {
+        const { bookingId } = req.params;
+        const { cardNumber, expiryDate, cvv } = req.body;
+      
+        await db.query("SET search_path = 'project'");
+        await db.query('UPDATE bookings_rentings SET card_no = $1, card_expiry = $2, card_cvv = $3 WHERE bookingid = $4', [cardNumber, expiryDate, cvv, bookingId]);
+        try {
+          // Simulate payment processing success
+          res.status(200).json({ status: "Success", message: "Payment processed successfully." });
+        } catch (error) {
+          console.error("Error processing payment", error);
+          res.status(500).json({ status: "Error", message: "Failed to process payment." });
+        }
+      });
+      
+
     app.get('/api/getallbookings', async (req, res) => {
         // Extract the email from the query parameters
         const { email } = req.query;
@@ -350,7 +413,7 @@ module.exports = function(app, db){
             console.error("Error Booking", error)
         }
     })
-    
+
     app.get('/api/availability', async (req, res) => {
         try {
             const result = await db.query("SELECT * FROM project.view_daily_room_availability");

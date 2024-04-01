@@ -648,15 +648,25 @@ FOR EACH ROW EXECUTE FUNCTION decrease_room_count();
 
 -- View to view available rooms per area per day
 CREATE MATERIALIZED VIEW view_daily_room_availability AS
-SELECT h.city, COUNT(r.roomid) AS available_rooms, CURRENT_DATE AS for_date
-FROM hotels h
-JOIN rooms r ON h.hotelid = r.hotelid
-WHERE r.roomid NOT IN (
-    SELECT b.roomid
-    FROM bookings_rentings b
-    WHERE CURRENT_DATE BETWEEN b.startdate AND b.enddate
-)
-GROUP BY h.city;
+SELECT 
+    h.city, 
+    COUNT(r.roomid) AS available_rooms, 
+    CURRENT_DATE + INTERVAL '1 day' AS for_date
+FROM 
+    hotels h
+JOIN 
+    rooms r ON h.hotelid = r.hotelid
+WHERE 
+    r.roomid NOT IN (
+        SELECT 
+            b.roomid
+        FROM 
+            bookings_rentings b
+        WHERE 
+            CURRENT_DATE + INTERVAL '1 day' BETWEEN b.startdate AND b.enddate
+    )
+GROUP BY 
+    h.city;
 
 -- Refresh View everyday
 REFRESH MATERIALIZED VIEW view_daily_room_availability;

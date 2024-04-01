@@ -39,7 +39,7 @@ const Navbar = () => {
     return (
         <nav>
             <Link to="/" className='navlink'>Home</Link>
-            {isLoggedIn && userRole === 'employee' && <Link to="/employeeBookings" className='navlink'>Customer Bookings</Link>}
+            {isLoggedIn && userRole === 'employee' && <Link to="/employeeSearchPage" className='navlink'>Customer Bookings</Link>}
             {isLoggedIn && userRole === 'customer' && <Link to="/bookings" className='navlink'>Customer Bookings</Link>}
             <Link to="/abouts" className='navlink'>About Us</Link>
             {
